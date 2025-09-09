@@ -46,6 +46,91 @@ public class ChessPiece {
         return type;
     }
 
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        List<ChessMove> moves = new ArrayList<>();
+        boolean capture = false;
+        boolean previousNull = false;
+
+        while (row < 8 && col < 8 && !capture) {
+            row += 1;
+            col += 1;
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                capture = true;
+
+                if (!previousNull) {
+                    moves.removeLast();
+                }
+            } else {
+                previousNull = true;
+            }
+        }
+        row = myPosition.getRow();
+        col = myPosition.getColumn();
+        capture = false;
+        previousNull = false;
+
+        while (row > 1 && col > 1 && !capture) {
+            row -= 1;
+            col -= 1;
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                capture = true;
+
+                if (!previousNull) {
+                    moves.removeLast();
+                }
+            } else {
+                previousNull = true;
+            }
+        }
+        row = myPosition.getRow();
+        col = myPosition.getColumn();
+        capture = false;
+        previousNull = false;
+
+        while (row > 1 && col < 8 && !capture) {
+            row -= 1;
+            col += 1;
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                capture = true;
+
+                if (!previousNull) {
+                    moves.removeLast();
+                }
+            } else {
+                previousNull = true;
+            }
+        }
+        row = myPosition.getRow();
+        col = myPosition.getColumn();
+        capture = false;
+        previousNull = false;
+
+        while (row < 8 && col > 1 && !capture) {
+            row += 1;
+            col -= 1;
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
+
+            if (board.getPiece(new ChessPosition(row, col)) != null) {
+                capture = true;
+
+                if (!previousNull) {
+                    moves.removeLast();
+                }
+            } else {
+                previousNull = true;
+            }
+        }
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -55,44 +140,11 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-        List<ChessMove> moves = new ArrayList<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
 
         if (piece.getPieceType() == PieceType.BISHOP) {
-            while (row < 8 && col < 8) {
-                row += 1;
-                col += 1;
-                moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row > 1 && col > 1) {
-                row -= 1;
-                col -= 1;
-                moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row > 1 && col < 8) {
-                row -= 1;
-                col += 1;
-                moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-            }
-
-            row = myPosition.getRow();
-            col = myPosition.getColumn();
-
-            while (row < 8 && col > 1) {
-                row += 1;
-                col -= 1;
-                moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-            }
+            return bishopMoves(board, myPosition);
+        } else {
+            return List.of();
         }
-        return moves;
     }
 }
