@@ -47,9 +47,9 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        List<ChessMove> moves = new ArrayList<>();
         boolean capture = false;
         boolean previousNull = false;
 
@@ -131,6 +131,37 @@ public class ChessPiece {
         return moves;
     }
 
+    private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
+        int row = startPosition.getRow();
+        int col = startPosition.getColumn();
+
+        while (true) {
+            row += rowAdd;
+            col += colAdd;
+
+            if (row < 1 || row > 8 || col < 1 || col > 8) {
+                break;
+            }
+            ChessPosition endPosition = new ChessPosition(row, col);
+            moves.add(new ChessMove(startPosition, endPosition, null));
+
+            if (board.getPiece(endPosition) != null) {
+                break;
+            }
+        }
+    }
+
+    private Collection<ChessMove> newBishopMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
+
+        addMoves(board, myPosition, +1, +1, moves);
+        addMoves(board, myPosition, -1, -1, moves);
+        addMoves(board, myPosition, +1, -1, moves);
+        addMoves(board, myPosition, -1, +1, moves);
+
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -142,7 +173,7 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
 
         if (piece.getPieceType() == PieceType.BISHOP) {
-            return bishopMoves(board, myPosition);
+            return newBishopMoves(board, myPosition);
         } else {
             return List.of();
         }
