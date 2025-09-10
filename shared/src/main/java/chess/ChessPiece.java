@@ -105,6 +105,14 @@ public class ChessPiece {
             return getBishopMoves(board, myPosition);
         } else if (piece.getPieceType() == PieceType.ROOK) {
             return getRookMoves(board, myPosition);
+        } else if (piece.getPieceType() == PieceType.QUEEN) {
+            Collection<ChessMove> bishopMoves = getBishopMoves(board, myPosition);
+            Collection<ChessMove> rookMoves = getRookMoves(board, myPosition);
+
+            Collection<ChessMove> queenMoves = new ArrayList<>(bishopMoves);
+            queenMoves.addAll(rookMoves);
+
+            return queenMoves;
         } else {
             return List.of();
         }
