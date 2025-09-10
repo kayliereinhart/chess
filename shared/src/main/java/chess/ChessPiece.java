@@ -92,13 +92,10 @@ public class ChessPiece {
     }
     
     private boolean validateMove(ChessBoard board, int row, int col) {
-        boolean inBounds = false;
         boolean positionEmpty = false;
         boolean capture = false;
         
-        if(row >= 1 && row <= 8 && col >= 1 && col <= 8) {
-            inBounds = true;
-        } else {
+        if(row < 1 || row > 8 || col < 1 || col > 8) {
             return false;
         }
 
