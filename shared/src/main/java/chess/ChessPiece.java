@@ -90,6 +90,41 @@ public class ChessPiece {
 
         return moves;
     }
+    
+    private boolean validateMove(ChessBoard board, int row, int col) {
+        boolean inBounds = false;
+        boolean positionEmpty = false;
+        boolean capture = false;
+        
+        if(row >= 1 && row <= 8 && col >= 1 && col <= 8) {
+            inBounds = true;
+        } else {
+            return false;
+        }
+
+        if (board.getPiece(new ChessPosition(row, col)) == null) {
+            positionEmpty = true;
+        } else if (board.getPiece(new ChessPosition(row, col)).getTeamColor() != pieceColor) {
+            capture = true;
+        }
+        return positionEmpty || capture;
+    }
+
+    private Collection<ChessMove> getKingMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        for (int i = -1; i <= 1; i++) {
+            for(int j = -1; j <= 1; j++) {
+                if ((i != 0 || i != j) && validateMove(board, row + i, col + j)) {
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, col + j), null));
+                }
+            }
+        }
+
+        return moves;
+    }
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -113,6 +148,8 @@ public class ChessPiece {
             queenMoves.addAll(rookMoves);
 
             return queenMoves;
+        } else if (piece.getPieceType() == PieceType.KING) {
+            return getKingMoves(board, myPosition);
         } else {
             return List.of();
         }
