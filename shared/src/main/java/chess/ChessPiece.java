@@ -46,6 +46,22 @@ public class ChessPiece {
         return type;
     }
 
+    private boolean outBounds(int row, int col) {
+        return (row < 1 || row > 8 || col < 1 || col > 8);
+    }
+
+    private boolean emptyOrCapture(ChessBoard board, ChessPosition position) {
+        boolean positionEmpty = false;
+        boolean capture = false;
+
+        if (board.getPiece(position) == null) {
+            positionEmpty = true;
+        } else if (board.getPiece(position).getTeamColor() != pieceColor) {
+            capture = true;
+        }
+        return positionEmpty || capture;
+    }
+
     private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
@@ -54,12 +70,12 @@ public class ChessPiece {
             row += rowAdd;
             col += colAdd;
 
-            if (row < 1 || row > 8 || col < 1 || col > 8) {
+            if (outBounds(row, col)) {
                 break;
             }
             ChessPosition endPosition = new ChessPosition(row, col);
 
-            if (board.getPiece(endPosition) == null || board.getPiece(endPosition).getTeamColor() != pieceColor) {
+            if (emptyOrCapture(board, endPosition)) {
                 moves.add(new ChessMove(startPosition, endPosition, null));
             }
 
@@ -90,22 +106,6 @@ public class ChessPiece {
 
         return moves;
     }
-    
-    private boolean validateMove(ChessBoard board, int row, int col) {
-        boolean positionEmpty = false;
-        boolean capture = false;
-        
-        if(row < 1 || row > 8 || col < 1 || col > 8) {
-            return false;
-        }
-
-        if (board.getPiece(new ChessPosition(row, col)) == null) {
-            positionEmpty = true;
-        } else if (board.getPiece(new ChessPosition(row, col)).getTeamColor() != pieceColor) {
-            capture = true;
-        }
-        return positionEmpty || capture;
-    }
 
     private Collection<ChessMove> getKingMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessMove> moves = new ArrayList<>();
@@ -114,8 +114,9 @@ public class ChessPiece {
 
         for (int i = -1; i <= 1; i++) {
             for(int j = -1; j <= 1; j++) {
-                if ((i != 0 || i != j) && validateMove(board, row + i, col + j)) {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, col + j), null));
+                ChessPosition endPosition = new ChessPosition(row + i, col + j);
+                if ((i != 0 || i != j) && !outBounds(row + i, col + j) && emptyOrCapture(board, endPosition)) {
+                    moves.add(new ChessMove(myPosition, endPosition, null));
                 }
             }
         }
