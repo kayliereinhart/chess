@@ -134,6 +134,7 @@ public class ChessPiece {
     private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
+        boolean previousNull = false;
 
         while (true) {
             row += rowAdd;
@@ -143,9 +144,14 @@ public class ChessPiece {
                 break;
             }
             ChessPosition endPosition = new ChessPosition(row, col);
-            moves.add(new ChessMove(startPosition, endPosition, null));
 
-            if (board.getPiece(endPosition) != null) {
+            if (board.getPiece(endPosition) == null || previousNull) {
+                moves.add(new ChessMove(startPosition, endPosition, null));
+            }
+
+            if (board.getPiece(endPosition) == null) {
+                previousNull = true;
+            } else {
                 break;
             }
         }
