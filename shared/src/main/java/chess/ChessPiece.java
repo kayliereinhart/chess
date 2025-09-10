@@ -49,7 +49,6 @@ public class ChessPiece {
     private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
-        boolean previousNull = false;
 
         while (true) {
             row += rowAdd;
@@ -60,13 +59,11 @@ public class ChessPiece {
             }
             ChessPosition endPosition = new ChessPosition(row, col);
 
-            if (board.getPiece(endPosition) == null || previousNull) {
+            if (board.getPiece(endPosition) == null || board.getPiece(endPosition).getTeamColor() != pieceColor) {
                 moves.add(new ChessMove(startPosition, endPosition, null));
             }
 
-            if (board.getPiece(endPosition) == null) {
-                previousNull = true;
-            } else {
+            if (board.getPiece(endPosition) != null) {
                 break;
             }
         }
