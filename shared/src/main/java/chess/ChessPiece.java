@@ -62,7 +62,7 @@ public class ChessPiece {
         return positionEmpty || capture;
     }
 
-    private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
+    private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove> moves) {
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
 
@@ -115,9 +115,42 @@ public class ChessPiece {
         for (int i = -1; i <= 1; i++) {
             for(int j = -1; j <= 1; j++) {
                 ChessPosition endPosition = new ChessPosition(row + i, col + j);
+
                 if ((i != 0 || i != j) && !outBounds(row + i, col + j) && emptyOrCapture(board, endPosition)) {
                     moves.add(new ChessMove(myPosition, endPosition, null));
                 }
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> getKnightMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+
+        // row + 2, col + 1
+        // row + 2, col - 1
+        // row + 1, col + 2
+        // row + 1, col - 2
+        // row - 1, col + 2
+        // row - 1, col - 2
+        // row - 2, col + 1
+        // row - 2, col - 1
+
+        // row - 2, col + 1
+        // row - 2, col - 1
+        // row + 2, col + 1
+        // row + 2, col - 1
+        // col - 2, row + 1
+        // col - 2, row - 1
+        // col + 2, row + 1
+        // col + 2, row - 1
+
+        for (int i = -2; i <= 2; i += 4) {
+            for (int j = -1; j <= 1; j += 2) {
+                ChessPosition endPosition1 = new ChessPosition(row + i, col + j);
+                ChessPosition endPosition2 = new ChessPosition(row + j, col + i);
             }
         }
 
@@ -139,15 +172,14 @@ public class ChessPiece {
         } else if (piece.getPieceType() == PieceType.ROOK) {
             return getRookMoves(board, myPosition);
         } else if (piece.getPieceType() == PieceType.QUEEN) {
-            Collection<ChessMove> bishopMoves = getBishopMoves(board, myPosition);
-            Collection<ChessMove> rookMoves = getRookMoves(board, myPosition);
-
-            Collection<ChessMove> queenMoves = new ArrayList<>(bishopMoves);
-            queenMoves.addAll(rookMoves);
+            Collection<ChessMove> queenMoves = getBishopMoves(board, myPosition);
+            queenMoves.addAll(getRookMoves(board, myPosition));
 
             return queenMoves;
         } else if (piece.getPieceType() == PieceType.KING) {
             return getKingMoves(board, myPosition);
+        } else if (piece.getPieceType() == PieceType.KNIGHT) {
+            return getKnightMoves(board, myPosition);
         } else {
             return List.of();
         }
