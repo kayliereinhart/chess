@@ -46,91 +46,6 @@ public class ChessPiece {
         return type;
     }
 
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-        List<ChessMove> moves = new ArrayList<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        boolean capture = false;
-        boolean previousNull = false;
-
-        while (row < 8 && col < 8 && !capture) {
-            row += 1;
-            col += 1;
-            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
-                capture = true;
-
-                if (!previousNull) {
-                    moves.removeLast();
-                }
-            } else {
-                previousNull = true;
-            }
-        }
-        row = myPosition.getRow();
-        col = myPosition.getColumn();
-        capture = false;
-        previousNull = false;
-
-        while (row > 1 && col > 1 && !capture) {
-            row -= 1;
-            col -= 1;
-            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
-                capture = true;
-
-                if (!previousNull) {
-                    moves.removeLast();
-                }
-            } else {
-                previousNull = true;
-            }
-        }
-        row = myPosition.getRow();
-        col = myPosition.getColumn();
-        capture = false;
-        previousNull = false;
-
-        while (row > 1 && col < 8 && !capture) {
-            row -= 1;
-            col += 1;
-            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
-                capture = true;
-
-                if (!previousNull) {
-                    moves.removeLast();
-                }
-            } else {
-                previousNull = true;
-            }
-        }
-        row = myPosition.getRow();
-        col = myPosition.getColumn();
-        capture = false;
-        previousNull = false;
-
-        while (row < 8 && col > 1 && !capture) {
-            row += 1;
-            col -= 1;
-            moves.add(new ChessMove(myPosition, new ChessPosition(row, col), null));
-
-            if (board.getPiece(new ChessPosition(row, col)) != null) {
-                capture = true;
-
-                if (!previousNull) {
-                    moves.removeLast();
-                }
-            } else {
-                previousNull = true;
-            }
-        }
-        return moves;
-    }
-
     private void addMoves(ChessBoard board, ChessPosition startPosition, int rowAdd, int colAdd, List<ChessMove>moves) {
         int row = startPosition.getRow();
         int col = startPosition.getColumn();
@@ -157,13 +72,24 @@ public class ChessPiece {
         }
     }
 
-    private Collection<ChessMove> newBishopMoves(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessMove> moves = new ArrayList<>();
 
-        addMoves(board, myPosition, +1, +1, moves);
+        addMoves(board, myPosition, 1, 1, moves);
         addMoves(board, myPosition, -1, -1, moves);
-        addMoves(board, myPosition, +1, -1, moves);
-        addMoves(board, myPosition, -1, +1, moves);
+        addMoves(board, myPosition, 1, -1, moves);
+        addMoves(board, myPosition, -1, 1, moves);
+
+        return moves;
+    }
+
+    private Collection<ChessMove> getRookMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
+
+        addMoves(board, myPosition, 1, 0, moves);
+        addMoves(board, myPosition, -1, 0, moves);
+        addMoves(board, myPosition, 0, 1, moves);
+        addMoves(board, myPosition, 0, -1, moves);
 
         return moves;
     }
@@ -179,7 +105,9 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
 
         if (piece.getPieceType() == PieceType.BISHOP) {
-            return newBishopMoves(board, myPosition);
+            return getBishopMoves(board, myPosition);
+        } else if (piece.getPieceType() == PieceType.ROOK) {
+            return getRookMoves(board, myPosition);
         } else {
             return List.of();
         }
