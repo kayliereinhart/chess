@@ -167,16 +167,12 @@ public class ChessPiece {
         boolean promote = false;
 
         if (pieceColor == ChessGame.TeamColor.BLACK) {
-            direction *= -1;
+            direction = -1;
+        }
 
-            if (myPosition.getRow() == 7) {
-                firstMove = true;
-            } else if (myPosition.getRow() == 2) {
-                promote = true;
-            }
-        } else if (myPosition.getRow() == 2) {
+        if ((pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2) || (pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7)) {
             firstMove = true;
-        } else if (myPosition.getRow() == 7) {
+        } else if ((pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 7) || (pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 2)) {
             promote = true;
         }
         ChessPosition endPosition = new ChessPosition(row + direction, col);
