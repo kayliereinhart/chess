@@ -50,6 +50,10 @@ public class ChessPiece {
         return (row < 1 || row > 8 || col < 1 || col > 8);
     }
 
+    private boolean captureEnemy(ChessBoard board, ChessPosition position) {
+        return board.getPiece(position) != null && board.getPiece(position).getTeamColor() != pieceColor;
+    }
+
     private boolean emptyOrCapture(ChessBoard board, ChessPosition position) {
         boolean positionEmpty = false;
         boolean capture = false;
@@ -154,6 +158,72 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
+        List<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        int direction = 1;
+        boolean firstMove = false;
+        boolean promote = false;
+
+        if (pieceColor == ChessGame.TeamColor.BLACK) {
+            direction *= -1;
+
+            if (myPosition.getRow() == 7) {
+                firstMove = true;
+            } else if (myPosition.getRow() == 2) {
+                promote = true;
+            }
+        } else if (myPosition.getRow() == 2) {
+            firstMove = true;
+        } else if (myPosition.getRow() == 7) {
+            promote = true;
+        }
+        ChessPosition endPosition = new ChessPosition(row + direction, col);
+
+        if (!outBounds(row + direction, col) && board.getPiece(endPosition) == null) {
+            if (promote) {
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.KNIGHT));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.QUEEN));
+            } else {
+                moves.add(new ChessMove(myPosition, endPosition, null));
+            }
+        }
+        endPosition = new ChessPosition(row + (2 * direction), col);
+
+        if (firstMove && !outBounds(row + (2 * direction), col) && board.getPiece(endPosition) == null && board.getPiece(new ChessPosition(row + direction, col)) == null) {
+            moves.add(new ChessMove(myPosition, endPosition, null));
+        }
+        endPosition = new ChessPosition(row + direction, col - 1);
+
+        if (!outBounds(row + direction, col - 1) && captureEnemy(board, endPosition)) {
+            if (promote) {
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.KNIGHT));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.QUEEN));
+            } else {
+                moves.add(new ChessMove(myPosition, endPosition, null));
+            }
+        }
+        endPosition = new ChessPosition(row + direction, col + 1);
+
+        if (!outBounds(row + direction, col + 1) && captureEnemy(board, endPosition)) {
+            if (promote) {
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.KNIGHT));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, endPosition, PieceType.QUEEN));
+            } else {
+                moves.add(new ChessMove(myPosition, endPosition, null));
+            }
+        }
+
+        return moves;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -177,6 +247,8 @@ public class ChessPiece {
             return getKingMoves(board, myPosition);
         } else if (piece.getPieceType() == PieceType.KNIGHT) {
             return getKnightMoves(board, myPosition);
+        } else if (piece.getPieceType() == PieceType.PAWN) {
+            return getPawnMoves(board, myPosition);
         } else {
             return List.of();
         }
