@@ -169,6 +169,32 @@ public class ChessPiece {
         }
     }
 
+    private void addForwardPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction, boolean promote, boolean firstMove, List<ChessMove> moves) {
+        ChessPosition endPosition = new ChessPosition(row + direction, col);
+
+        if (!outBounds(row + direction, col) && board.getPiece(endPosition) == null) {
+            addPawnMoves(start, endPosition, promote, moves);
+            endPosition = new ChessPosition(row + (2 * direction), col);
+
+            if (firstMove && !outBounds(row + (2 * direction), col) && board.getPiece(endPosition) == null) {
+                moves.add(new ChessMove(start, endPosition, null));
+            }
+        }
+    }
+
+    private void addCapturePawnMove(ChessBoard board, ChessPosition start, int row, int col, int rowDirection, int colDirection, boolean promote, List<ChessMove> moves) {
+        ChessPosition end = new ChessPosition(row + rowDirection, col + colDirection);
+
+        if (!outBounds(row + rowDirection, col + colDirection) && captureEnemy(board, end)) {
+            addPawnMoves(start, end, promote, moves);
+        }
+    }
+
+    private void addDiagonalPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction, boolean promote, List<ChessMove> moves) {
+        addCapturePawnMove(board, start, row, col, direction, -1, promote, moves);
+        addCapturePawnMove(board, start, row, col, direction, 1, promote, moves);
+    }
+
     private Collection<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessMove> moves = new ArrayList<>();
         int row = myPosition.getRow();
@@ -186,26 +212,8 @@ public class ChessPiece {
         } else if ((pieceColor == ChessGame.TeamColor.WHITE && row == 7) || (pieceColor == ChessGame.TeamColor.BLACK && row == 2)) {
             promote = true;
         }
-        ChessPosition endPosition = new ChessPosition(row + direction, col);
-
-        if (!outBounds(row + direction, col) && board.getPiece(endPosition) == null) {
-            addPawnMoves(myPosition, endPosition, promote, moves);
-        }
-        endPosition = new ChessPosition(row + (2 * direction), col);
-
-        if (firstMove && !outBounds(row + (2 * direction), col) && board.getPiece(endPosition) == null && board.getPiece(new ChessPosition(row + direction, col)) == null) {
-            moves.add(new ChessMove(myPosition, endPosition, null));
-        }
-        endPosition = new ChessPosition(row + direction, col - 1);
-
-        if (!outBounds(row + direction, col - 1) && captureEnemy(board, endPosition)) {
-            addPawnMoves(myPosition, endPosition, promote, moves);
-        }
-        endPosition = new ChessPosition(row + direction, col + 1);
-
-        if (!outBounds(row + direction, col + 1) && captureEnemy(board, endPosition)) {
-            addPawnMoves(myPosition, endPosition, promote, moves);
-        }
+        addForwardPawnMoves(board, myPosition, row, col, direction, promote, firstMove, moves);
+        addDiagonalPawnMoves(board, myPosition, row, col, direction, promote, moves);
 
         return moves;
     }
