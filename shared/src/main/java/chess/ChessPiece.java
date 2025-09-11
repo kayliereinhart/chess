@@ -129,15 +129,6 @@ public class ChessPiece {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
 
-        // row + 2, col + 1
-        // row + 2, col - 1
-        // row + 1, col + 2
-        // row + 1, col - 2
-        // row - 1, col + 2
-        // row - 1, col - 2
-        // row - 2, col + 1
-        // row - 2, col - 1
-
         // row - 2, col + 1
         // row - 2, col - 1
         // row + 2, col + 1
@@ -151,9 +142,15 @@ public class ChessPiece {
             for (int j = -1; j <= 1; j += 2) {
                 ChessPosition endPosition1 = new ChessPosition(row + i, col + j);
                 ChessPosition endPosition2 = new ChessPosition(row + j, col + i);
+
+                if (!outBounds(row + i, col + j) && emptyOrCapture(board, endPosition1)) {
+                    moves.add(new ChessMove(myPosition, endPosition1, null));
+                }
+                if (!outBounds(row + j, col + i) && emptyOrCapture(board, endPosition2)) {
+                    moves.add(new ChessMove(myPosition, endPosition2, null));
+                }
             }
         }
-
         return moves;
     }
 
