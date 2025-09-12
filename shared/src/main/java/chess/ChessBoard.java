@@ -40,6 +40,25 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for (int i = 0; i <= 7; i++) {
+            ChessPiece.PieceType type;
+
+            if (i == 0 || i == 7) {
+                type = ChessPiece.PieceType.ROOK;
+            } else if (i == 1 || i == 6) {
+                type = ChessPiece.PieceType.KNIGHT;
+            } else if (i == 2 || i == 5) {
+                type = ChessPiece.PieceType.BISHOP;
+            } else if (i == 3) {
+                type = ChessPiece.PieceType.QUEEN;
+            } else {
+                type = ChessPiece.PieceType.KING;
+            }
+            board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+            board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+
+            board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
+        }
     }
 }

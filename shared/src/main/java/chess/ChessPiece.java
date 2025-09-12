@@ -169,7 +169,8 @@ public class ChessPiece {
         }
     }
 
-    private void addForwardPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction, boolean promote, boolean firstMove, List<ChessMove> moves) {
+    private void addForwardPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction,
+                                     boolean promote, boolean firstMove, List<ChessMove> moves) {
         ChessPosition endPosition = new ChessPosition(row + direction, col);
 
         if (!outBounds(row + direction, col) && board.getPiece(endPosition) == null) {
@@ -182,7 +183,8 @@ public class ChessPiece {
         }
     }
 
-    private void addCapturePawnMove(ChessBoard board, ChessPosition start, int row, int col, int rowDirection, int colDirection, boolean promote, List<ChessMove> moves) {
+    private void addCapturePawnMove(ChessBoard board, ChessPosition start, int row, int col, int rowDirection,
+                                    int colDirection, boolean promote, List<ChessMove> moves) {
         ChessPosition end = new ChessPosition(row + rowDirection, col + colDirection);
 
         if (!outBounds(row + rowDirection, col + colDirection) && captureEnemy(board, end)) {
@@ -190,7 +192,8 @@ public class ChessPiece {
         }
     }
 
-    private void addDiagonalPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction, boolean promote, List<ChessMove> moves) {
+    private void addDiagonalPawnMoves(ChessBoard board, ChessPosition start, int row, int col, int direction,
+                                      boolean promote, List<ChessMove> moves) {
         addCapturePawnMove(board, start, row, col, direction, -1, promote, moves);
         addCapturePawnMove(board, start, row, col, direction, 1, promote, moves);
     }
@@ -207,9 +210,11 @@ public class ChessPiece {
             direction = -1;
         }
 
-        if ((pieceColor == ChessGame.TeamColor.WHITE && row == 2) || (pieceColor == ChessGame.TeamColor.BLACK && row == 7)) {
+        if ((pieceColor == ChessGame.TeamColor.WHITE && row == 2) ||
+                (pieceColor == ChessGame.TeamColor.BLACK && row == 7)) {
             firstMove = true;
-        } else if ((pieceColor == ChessGame.TeamColor.WHITE && row == 7) || (pieceColor == ChessGame.TeamColor.BLACK && row == 2)) {
+        } else if ((pieceColor == ChessGame.TeamColor.WHITE && row == 7) ||
+                (pieceColor == ChessGame.TeamColor.BLACK && row == 2)) {
             promote = true;
         }
         addForwardPawnMoves(board, myPosition, row, col, direction, promote, firstMove, moves);
