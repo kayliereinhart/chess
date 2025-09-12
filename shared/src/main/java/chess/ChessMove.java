@@ -52,15 +52,16 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+        return (startPosition.equals(chessMove.startPosition) && endPosition.equals(chessMove.endPosition) &&
+                promotionPiece == chessMove.promotionPiece);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startPosition, endPosition, promotionPiece);
+        var promotionCode = (promotionPiece == null ? 9 : promotionPiece.ordinal());
+        return (71 * startPosition.hashCode()) + endPosition.hashCode() + promotionCode;
     }
 }
