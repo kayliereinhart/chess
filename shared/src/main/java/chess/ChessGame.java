@@ -61,7 +61,7 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
         for (ChessMove move : moves) {
-            testBoard = board;
+            testBoard = board.clone();
             testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
             testBoard.addPiece(move.getStartPosition(), null);
 
@@ -98,7 +98,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPiece piece;
         ChessPosition pos;
-        ChessPosition kingPos = new ChessPosition(1, 1);
+        ChessPosition kingPos = testBoard.findKing(teamTurn);
         Collection<ChessMove> moves;
 
         for (int i = 1; i <= 8; i++) {
