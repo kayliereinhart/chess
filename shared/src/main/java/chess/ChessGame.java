@@ -55,7 +55,7 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
 
-        if (piece == null || teamTurn != piece.getTeamColor()) {
+        if (piece == null) {
             return null;
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
@@ -66,7 +66,7 @@ public class ChessGame {
             testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
             testBoard.addPiece(move.getStartPosition(), null);
 
-            if (!isInCheck(teamTurn)) {
+            if (!isInCheck(piece.getTeamColor())) {
                 valid.add(move);
             }
         }
@@ -88,7 +88,7 @@ public class ChessGame {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
 
-        if (valid != null && valid.contains(move)) {
+        if (valid != null && valid.contains(move) && piece.getTeamColor() == teamTurn) {
             board.addPiece(move.getEndPosition(), piece);
             board.addPiece(move.getStartPosition(), null);
 
@@ -111,7 +111,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ChessPiece piece;
         ChessPosition pos;
-        ChessPosition kingPos = testBoard.findKing(teamTurn);
+        ChessPosition kingPos = testBoard.findKing(teamColor);
         Collection<ChessMove> moves;
 
         for (int i = 1; i <= 8; i++) {
@@ -119,7 +119,7 @@ public class ChessGame {
                 pos = new ChessPosition(i, j);
                 piece = testBoard.getPiece(pos);
 
-                if (piece != null && piece.getTeamColor() != teamTurn) {
+                if (piece != null && piece.getTeamColor() != teamColor) {
                     moves = piece.pieceMoves(testBoard, pos);
                     List<ChessPosition> endPositions = new ArrayList<>();
 
