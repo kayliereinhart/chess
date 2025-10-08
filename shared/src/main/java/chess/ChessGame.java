@@ -81,7 +81,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
 
-        if (valid == null || valid.contains(move)) {
+        if (valid != null && valid.contains(move)) {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.addPiece(move.getStartPosition(), null);
         } else {
@@ -100,7 +100,6 @@ public class ChessGame {
         ChessPosition pos;
         ChessPosition kingPos = testBoard.findKing(teamTurn);
         Collection<ChessMove> moves;
-        boolean inCheck = false;
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -115,13 +114,12 @@ public class ChessGame {
                         endPositions.add(move.getEndPosition());
                     }
                     if (endPositions.contains(kingPos)) {
-                        inCheck = true;
-                        return inCheck;
+                        return true;
                     }
                 }
             }
         }
-        return inCheck;
+        return false;
     }
 
     /**
