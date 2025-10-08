@@ -60,8 +60,10 @@ public class ChessGame {
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
-        for (ChessMove move: moves) {
+        for (ChessMove move : moves) {
             testBoard = board.clone();
+            testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
+            testBoard.addPiece(move.getStartPosition(), null);
 
             if (isInCheck(teamTurn)) {
                 moves.remove(move);
@@ -94,16 +96,6 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
-    public boolean isInCheckmate(TeamColor teamColor) {
         ChessPiece piece;
         ChessPosition pos;
         ChessPosition kingPos = testBoard.findKing(teamTurn);
@@ -114,9 +106,9 @@ public class ChessGame {
             for (int j = 1; j <= 8; j++) {
                 pos = new ChessPosition(i, j);
                 piece = testBoard.getPiece(pos);
-                moves = piece.pieceMoves(testBoard, pos);
 
                 if (piece != null && piece.getTeamColor() != teamTurn) {
+                    moves = piece.pieceMoves(testBoard, pos);
                     List<ChessPosition> endPositions = new ArrayList<>();
 
                     for (ChessMove move : moves) {
@@ -130,6 +122,16 @@ public class ChessGame {
             }
         }
         return inCheck;
+    }
+
+    /**
+     * Determines if the given team is in checkmate
+     *
+     * @param teamColor which team to check for checkmate
+     * @return True if the specified team is in checkmate
+     */
+    public boolean isInCheckmate(TeamColor teamColor) {
+        throw new RuntimeException("Not implemented");
     }
 
     /**
