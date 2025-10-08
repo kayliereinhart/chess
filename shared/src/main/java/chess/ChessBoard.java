@@ -9,9 +9,9 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard implements Cloneable {
+public class ChessBoard {
 
-    final private ChessPiece[][] board = new ChessPiece[8][8];
+    private final ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
         
@@ -24,7 +24,7 @@ public class ChessBoard implements Cloneable {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = piece;
+        board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -35,7 +35,7 @@ public class ChessBoard implements Cloneable {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()-1][position.getColumn()-1];
+        return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -44,50 +44,42 @@ public class ChessBoard implements Cloneable {
      */
     public void resetBoard() {
         for (int i = 0; i <= 7; i++) {
-            ChessPiece.PieceType type;
-
             if (i == 0 || i == 7) {
-                type = ChessPiece.PieceType.ROOK;
+                board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+                board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
             } else if (i == 1 || i == 6) {
-                type = ChessPiece.PieceType.KNIGHT;
+                board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+                board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
             } else if (i == 2 || i == 5) {
-                type = ChessPiece.PieceType.BISHOP;
+                board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+                board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
             } else if (i == 3) {
-                type = ChessPiece.PieceType.QUEEN;
+                board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+                board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
             } else {
-                type = ChessPiece.PieceType.KING;
+                board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+                board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
             }
-            board[0][i] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
             board[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-
             board[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            board[7][i] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
         }
-    }
-
-    public ChessPosition findKing(ChessGame.TeamColor color) {
-        ChessPiece piece;
-        ChessPosition pos;
-        ChessPosition kingPos;
-
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                pos = new ChessPosition(i, j);
-                piece = getPiece(pos);
-
-                if (piece.getTeamColor() == color && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    return pos;
-                }
-            }
-        }
-        return null;
     }
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        String str = "";
+
+        for (int i = 0; i <= 7; i++) {
+            for (int j = 0; j <= 7; j++) {
+                if (board[i][j] == null) {
+                    str += "null";
+                } else {
+                    str += board[i][j].toString();
+                }
+            }
+        }
+
+        return str;
     }
 
     @Override
@@ -102,15 +94,5 @@ public class ChessBoard implements Cloneable {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
-    }
-
-    @Override
-    public ChessBoard clone() {
-        ChessBoard clone = new ChessBoard();
-
-        for (int i = 0; i < 8; i++) {
-            clone.board[i] = Arrays.copyOf(board[i], 8);
-        }
-        return clone;
     }
 }

@@ -36,7 +36,9 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return String.format("[%d,%d]", row, col);
+        return "[" + row +
+                "," + col +
+                ']';
     }
 
     @Override
@@ -44,8 +46,8 @@ public class ChessPosition {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ChessPosition otherPosition = (ChessPosition) o;
-        return row == otherPosition.row && col == otherPosition.col;
+        ChessPosition that = (ChessPosition) o;
+        return row == that.row && col == that.col;
     }
 
     @Override
