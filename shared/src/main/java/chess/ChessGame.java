@@ -59,7 +59,7 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
         for (ChessMove move: moves) {
-            testBoard = board;
+            testBoard = board.clone();
             if (isInCheck(teamTurn)) {
                 moves.remove(move);
             }
@@ -75,6 +75,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
+
         if (valid == null || valid.contains(move)) {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.addPiece(move.getStartPosition(), null);

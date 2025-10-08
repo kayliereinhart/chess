@@ -80,11 +80,11 @@ public class ChessBoard implements Cloneable {
     }
 
     @Override
-    public ChessPiece[][] clone() {
-        ChessPiece[][] clone = new ChessPiece[8][8];
+    public ChessBoard clone() {
+        ChessBoard clone = new ChessBoard();
 
         for (int i = 0; i < 8; i++) {
-            clone[i] = Arrays.copyOf(board[i], 8);
+            clone.board[i] = Arrays.copyOf(board[i], 8);
         }
         return clone;
     }
