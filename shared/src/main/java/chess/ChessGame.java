@@ -13,6 +13,7 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board = new ChessBoard();
+    private ChessBoard testBoard;
 
     public ChessGame() {
 
@@ -58,11 +59,11 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
         for (ChessMove move: moves) {
+            testBoard = board;
             if (isInCheck(teamTurn)) {
                 moves.remove(move);
             }
         }
-
         return moves;
     }
 
