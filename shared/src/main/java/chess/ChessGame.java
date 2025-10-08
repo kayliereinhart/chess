@@ -59,17 +59,18 @@ public class ChessGame {
             return null;
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> valid = new ArrayList<>();
 
         for (ChessMove move : moves) {
             testBoard = board.clone();
             testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
             testBoard.addPiece(move.getStartPosition(), null);
 
-            if (isInCheck(teamTurn)) {
-                moves.remove(move);
+            if (!isInCheck(teamTurn)) {
+                valid.add(move);
             }
         }
-        return moves;
+        return valid;
     }
 
     /**
@@ -84,14 +85,14 @@ public class ChessGame {
         if (valid != null && valid.contains(move)) {
             board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
             board.addPiece(move.getStartPosition(), null);
+
+            if (teamTurn == TeamColor.WHITE) {
+                teamTurn = TeamColor.BLACK;
+            } else {
+                teamTurn = TeamColor.WHITE;
+            }
         } else {
             throw new InvalidMoveException("Invalid Move");
-        }
-
-        if (teamTurn == TeamColor.WHITE) {
-            teamTurn = TeamColor.BLACK;
-        } else {
-            teamTurn = TeamColor.WHITE;
         }
     }
 
