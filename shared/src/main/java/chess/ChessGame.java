@@ -87,6 +87,12 @@ public class ChessGame {
         } else {
             throw new InvalidMoveException("Invalid Move");
         }
+
+        if (teamTurn == TeamColor.WHITE) {
+            teamTurn = TeamColor.BLACK;
+        } else {
+            teamTurn = TeamColor.WHITE;
+        }
     }
 
     /**
