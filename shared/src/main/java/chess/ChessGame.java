@@ -83,7 +83,8 @@ public class ChessGame {
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
         ChessPiece piece = board.getPiece(move.getStartPosition());
 
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                move.getPromotionPiece() != null) {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
 
