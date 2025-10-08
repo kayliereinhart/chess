@@ -52,10 +52,16 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
 
-        if (piece == null) {
+        if (piece == null || teamTurn != piece.getTeamColor()) {
             return null;
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        for (ChessMove move: moves) {
+            if (isInCheck(teamTurn)) {
+                moves.remove(move);
+            }
+        }
 
         return moves;
     }
