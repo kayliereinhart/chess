@@ -65,6 +65,24 @@ public class ChessBoard implements Cloneable {
         }
     }
 
+    public ChessPosition findKing(ChessGame.TeamColor color) {
+        ChessPiece piece;
+        ChessPosition pos;
+        ChessPosition kingPos;
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                pos = new ChessPosition(i, j);
+                piece = getPiece(pos);
+
+                if (piece.getTeamColor() == color && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

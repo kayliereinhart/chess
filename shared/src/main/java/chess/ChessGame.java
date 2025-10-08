@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -60,6 +62,7 @@ public class ChessGame {
 
         for (ChessMove move: moves) {
             testBoard = board.clone();
+
             if (isInCheck(teamTurn)) {
                 moves.remove(move);
             }
@@ -101,7 +104,32 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece;
+        ChessPosition pos;
+        ChessPosition kingPos = testBoard.findKing(teamTurn);
+        Collection<ChessMove> moves;
+        boolean inCheck = false;
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                pos = new ChessPosition(i, j);
+                piece = testBoard.getPiece(pos);
+                moves = piece.pieceMoves(testBoard, pos);
+
+                if (piece != null && piece.getTeamColor() != teamTurn) {
+                    List<ChessPosition> endPositions = new ArrayList<>();
+
+                    for (ChessMove move : moves) {
+                        endPositions.add(move.getEndPosition());
+                    }
+                    if (endPositions.contains(kingPos)) {
+                        inCheck = true;
+                        return inCheck;
+                    }
+                }
+            }
+        }
+        return inCheck;
     }
 
     /**
