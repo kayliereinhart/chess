@@ -13,12 +13,13 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    private TeamColor teamTurn;
-    private ChessBoard board = new ChessBoard();
+    private TeamColor teamTurn = TeamColor.WHITE;
+    private ChessBoard board;
     private ChessBoard testBoard;
 
     public ChessGame() {
-
+        board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -157,7 +158,26 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition pos;
+        ChessPiece piece;
+        Collection<ChessMove> moves;
+
+        if (isInCheck(teamColor)) {
+            return false;
+        } else {
+            for (int i = 1; i <= 8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    pos = new ChessPosition(i, j);
+                    piece = board.getPiece(pos);
+                    moves = validMoves(pos);
+
+                    if (moves != null && !moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
