@@ -15,7 +15,6 @@ public class ChessGame {
 
     private TeamColor teamTurn = TeamColor.WHITE;
     private ChessBoard board;
-    private ChessBoard testBoard;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -63,7 +62,7 @@ public class ChessGame {
         Collection<ChessMove> valid = new ArrayList<>();
 
         for (ChessMove move : moves) {
-            testBoard = board.clone();
+            ChessBoard testBoard = board.clone();
             testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
             testBoard.addPiece(move.getStartPosition(), null);
 
@@ -147,7 +146,30 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            ChessPosition pos;
+            Collection<ChessMove> moves;
+            //loop through each position on the board
+            //check if there is a valid move that would result in no more check
+            for (int i = 1; i <= 8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    pos = new ChessPosition(i, j);
+                    moves = validMoves(pos);
+
+                    for (ChessMove move : moves) {
+                        ChessBoard testBoard = board.clone();
+                        testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(pos));
+                        testBoard.addPiece(pos, null);
+
+                        if (!boardInCheck(teamColor, testBoard)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -159,7 +181,6 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         ChessPosition pos;
-        ChessPiece piece;
         Collection<ChessMove> moves;
 
         if (isInCheck(teamColor)) {
@@ -168,7 +189,6 @@ public class ChessGame {
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
                     pos = new ChessPosition(i, j);
-                    piece = board.getPiece(pos);
                     moves = validMoves(pos);
 
                     if (moves != null && !moves.isEmpty()) {
