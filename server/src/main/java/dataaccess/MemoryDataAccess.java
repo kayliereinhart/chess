@@ -15,8 +15,8 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void getUser(String username) {
-        users.get(username);
+    public UserData getUser(String username) {
+        return users.get(username);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public void getAuth(String authToken) {
-        auths.get(authToken);
+    public AuthData getAuth(String authToken) {
+        return auths.get(authToken);
     }
 }

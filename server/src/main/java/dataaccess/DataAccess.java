@@ -5,8 +5,8 @@ import model.UserData;
 
 public interface DataAccess {
     void createUser(UserData userData);
-    void getUser(String username);
+    UserData getUser(String username);
 
     void createAuth(AuthData authData);
-    void getAuth(String authToken);
+    AuthData getAuth(String authToken);
 }
