@@ -5,11 +5,11 @@ import dataaccess.MemoryDataAccess;
 import datamodel.RegistrationResult;
 import datamodel.UserData;
 
-public class userService {
+public class UserService {
     private DataAccess dataAccess = new MemoryDataAccess();
 
-    public RegistrationResult register(UserData userData) {
-        dataAccess.createUser(userData);
-        return new RegistrationResult("NewUser", "xyz");
+    public RegistrationResult register(UserData registerRequest) {
+        dataAccess.createUser(registerRequest);
+        return new RegistrationResult(registerRequest.username(), "xyz");
     }
 }
