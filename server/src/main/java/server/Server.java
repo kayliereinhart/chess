@@ -1,10 +1,7 @@
 package server;
 
-import com.google.gson.Gson;
-import datamodel.User;
 import io.javalin.*;
 import io.javalin.http.Context;
-import service.userService;
 
 public class Server {
 
@@ -19,11 +16,7 @@ public class Server {
     }
 
     private void register(Context ctx) {
-        Gson serializer = new Gson();
-        String reqJson = ctx.body();
-        var req = serializer.fromJson(reqJson, User.class);
-
-        var res = userService.register(req);
+        //send json to RegisterHandler
     }
 
     public int run(int desiredPort) {

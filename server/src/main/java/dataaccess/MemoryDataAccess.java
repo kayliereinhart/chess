@@ -1,14 +1,14 @@
 package dataaccess;
 
-import datamodel.User;
+import datamodel.UserData;
 import java.util.HashMap;
 
 public class MemoryDataAccess implements DataAccess {
-    private HashMap<String, User> users = new HashMap<>();
+    private HashMap<String, UserData> users = new HashMap<>();
 
     @Override
-    public void createUser(User user) {
-        users.put(user.username(), user);
+    public void createUser(UserData userData) {
+        users.put(userData.username(), userData);
     }
 
     @Override

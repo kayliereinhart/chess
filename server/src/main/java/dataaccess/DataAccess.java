@@ -1,9 +1,9 @@
 package dataaccess;
 
-import datamodel.User;
+import datamodel.UserData;
 
 public interface DataAccess {
-    public void createUser(User user);
+    public void createUser(UserData userData);
 
     public void getUser(String username);
 }
