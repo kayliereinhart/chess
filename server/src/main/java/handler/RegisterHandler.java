@@ -9,13 +9,13 @@ public class RegisterHandler {
     //create RegisterRequest(same as UserData) from json
     //call UserService register(RegisterRequest)
     //service returns RegistrationResult, turn into json and return to server
-    private UserService userService;
+    private final UserService userService = new UserService();
+    private final Gson serializer = new Gson();
 
-    public String handleRegister(String reqJson) {
-        Gson serializer = new Gson();
-        UserData registerRequest = serializer.fromJson(reqJson, UserData.class);
-        RegistrationResult res = userService.register(registerRequest);
+    public String handleRegister(String requestJson) {
+        UserData registerRequest = serializer.fromJson(requestJson, UserData.class);
+        RegistrationResult registrationResult = userService.register(registerRequest);
 
-        return serializer.toJson(res);
+        return serializer.toJson(registrationResult);
     }
 }

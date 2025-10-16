@@ -7,10 +7,11 @@ import io.javalin.http.Context;
 public class Server {
 
     private final Javalin server;
-    private final RegisterHandler registerHandler = new RegisterHandler();
+    private final RegisterHandler registerHandler;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
+        registerHandler = new RegisterHandler();
 
         // Register your endpoints and exception handlers here.
         server.delete("db", ctx -> ctx.result("{}"));
@@ -19,11 +20,9 @@ public class Server {
     }
 
     private void register(Context ctx) {
-        //send json to RegisterHandler
-        String reqJson = ctx.body();
-        String res = registerHandler.handleRegister(reqJson);
-
-        ctx.result(res);
+        String requestJson = ctx.body();
+        String responseJson = registerHandler.handleRegister(requestJson);
+        ctx.result(responseJson);
     }
 
     public int run(int desiredPort) {
