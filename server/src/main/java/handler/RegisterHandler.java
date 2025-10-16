@@ -1,8 +1,8 @@
 package handler;
 
 import com.google.gson.Gson;
-import datamodel.RegistrationResult;
-import datamodel.UserData;
+import model.AuthData;
+import model.UserData;
 import service.UserService;
 
 public class RegisterHandler {
@@ -14,7 +14,7 @@ public class RegisterHandler {
 
     public String handleRegister(String requestJson) {
         UserData registerRequest = serializer.fromJson(requestJson, UserData.class);
-        RegistrationResult registrationResult = userService.register(registerRequest);
+        AuthData registrationResult = userService.register(registerRequest);
 
         return serializer.toJson(registrationResult);
     }
