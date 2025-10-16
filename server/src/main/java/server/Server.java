@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import datamodel.User;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.userService;
 
 public class Server {
 
