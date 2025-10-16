@@ -4,7 +4,6 @@ import server.Server;
 public class RegisterTests {
     @Test
     public void register() {
-        Server server = new Server();
-        ;
+
     }
 }

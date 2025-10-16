@@ -3,7 +3,7 @@ package dataaccess;
 import datamodel.UserData;
 
 public interface DataAccess {
-    public void createUser(UserData userData);
+    void createUser(UserData userData);
 
-    public void getUser(String username);
+    void getUser(String username);
 }
