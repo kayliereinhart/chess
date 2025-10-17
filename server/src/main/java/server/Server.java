@@ -40,8 +40,8 @@ public class Server {
     }
 
     private void logout(Context ctx) {
-        String requestJson = ctx.body();
-        userHandler.handleLogout(requestJson);
+        String authToken = ctx.header("authorization");
+        userHandler.handleLogout(authToken);
     }
 
     private void clear(Context ctx) {

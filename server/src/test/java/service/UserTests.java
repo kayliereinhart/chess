@@ -106,4 +106,10 @@ public class UserTests {
         UserData loginRequest = new UserData("ExistingUser", null, null);
         assertThrows(BadRequestResponse.class, () -> userService.login(loginRequest));
     }
+
+    @Test
+    public void positiveLogout() {
+        assertDoesNotThrow(() -> userService.logout(existingAuth));
+        assertThrows(UnauthorizedResponse.class, () -> userService.logout(existingAuth));
+    }
 }
