@@ -2,10 +2,9 @@ package service;
 
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
-import io.javalin.http.HttpResponseException;
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +81,29 @@ public class UserTests {
     public void positiveLogin() {
         AuthData registerResponse = assertDoesNotThrow(() -> userService.login(existingUser));
         assertEquals(existingUser.username(), registerResponse.username());
-        assertEquals(existingAuth, registerResponse.authToken());
+        assertNotNull(registerResponse.authToken());
+    }
+
+    @Test
+    public void loginInvalidUsername() {
+        assertThrows(UnauthorizedResponse.class, () -> userService.login(newUser));
+    }
+
+    @Test
+    public void loginInvalidPassword() {
+        UserData loginRequest = new UserData("ExistingUser", "existingUserWrongPassword", null);
+        assertThrows(UnauthorizedResponse.class, () -> userService.login(loginRequest));
+    }
+
+    @Test
+    public void loginWithoutUsername() {
+        UserData loginRequest = new UserData(null, "existingUserPassword", null);
+        assertThrows(BadRequestResponse.class, () -> userService.login(loginRequest));
+    }
+
+    @Test
+    public void loginWithoutPassword() {
+        UserData loginRequest = new UserData("ExistingUser", null, null);
+        assertThrows(BadRequestResponse.class, () -> userService.login(loginRequest));
     }
 }
