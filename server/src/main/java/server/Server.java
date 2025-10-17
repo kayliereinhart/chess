@@ -1,6 +1,5 @@
 package server;
 
-import dataaccess.DataAccessException;
 import handler.ExceptionHandler;
 import handler.RegisterHandler;
 import io.javalin.*;

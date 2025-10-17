@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
-import io.javalin.http.BadRequestResponse;
 import model.AuthData;
 import model.UserData;
 
@@ -21,7 +20,7 @@ public class UserService {
         if (existingUser != null) {
             throw new AlreadyTakenException("already taken");
         } else if (userData.username() == null || userData.password() == null || userData.email() == null) {
-            throw new BadRequestResponse("bad request");
+            throw new BadRequestException("bad request");
         }
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
