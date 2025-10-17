@@ -2,9 +2,11 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.HttpResponseException;
 import model.AuthData;
 import model.UserData;
-
 import java.util.UUID;
 
 public class UserService {
@@ -14,13 +16,13 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public AuthData register(UserData userData) throws Exception {
+    public AuthData register(UserData userData) throws HttpResponseException {
         UserData existingUser = dataAccess.getUser(userData.username());
 
         if (existingUser != null) {
-            throw new AlreadyTakenException("already taken");
+            throw new ForbiddenResponse("already taken");
         } else if (userData.username() == null || userData.password() == null || userData.email() == null) {
-            throw new BadRequestException("bad request");
+            throw new BadRequestResponse("bad request");
         }
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
@@ -29,5 +31,10 @@ public class UserService {
         dataAccess.createAuth(authData);
 
         return authData;
+    }
+
+    public void clear() {
+        dataAccess.clearUsers();
+        dataAccess.clearAuths();
     }
 }

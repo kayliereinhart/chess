@@ -1,33 +1,38 @@
 package server;
 
 import handler.ExceptionHandler;
-import handler.RegisterHandler;
+import handler.UserHandler;
 import io.javalin.*;
 import io.javalin.http.Context;
+import io.javalin.http.HttpResponseException;
 
 public class Server {
 
     private final Javalin server;
-    private final RegisterHandler registerHandler;
+    private final UserHandler userHandler;
     private final ExceptionHandler exceptionHandler;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
-        registerHandler = new RegisterHandler();
+        userHandler = new UserHandler();
         exceptionHandler = new ExceptionHandler();
 
         // Register your endpoints and exception handlers here.
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", this::clear);
         server.post("user", this::register);
 
-        server.exception(Exception.class, this::handleException);
+        server.exception(HttpResponseException.class, this::handleException);
 
     }
 
-    private void register(Context ctx) throws Exception {
+    private void register(Context ctx) throws HttpResponseException {
         String requestJson = ctx.body();
-        String responseJson = registerHandler.handleRegister(requestJson);
+        String responseJson = userHandler.handleRegister(requestJson);
         ctx.result(responseJson);
+    }
+
+    private void clear(Context ctx) {
+        userHandler.handleClear();
     }
 
     private void handleException(Exception e, Context ctx) {
