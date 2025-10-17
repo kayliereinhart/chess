@@ -51,6 +51,15 @@ public class UserService {
         return authData;
     }
 
+    public void logout(String authToken) throws HttpResponseException {
+        AuthData authData = dataAccess.getAuth(authToken);
+
+        if (authData == null) {
+            throw new UnauthorizedResponse("unauthorized");
+        }
+        dataAccess.deleteAuth(authToken);
+    }
+
     public void clear() {
         dataAccess.clearUsers();
         dataAccess.clearAuths();

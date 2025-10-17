@@ -26,6 +26,10 @@ public class UserHandler {
         return serializer.toJson(loginResult);
     }
 
+    public void handleLogout(String authToken) throws HttpResponseException {
+        userService.logout(authToken);
+    }
+
     public void handleClear() {
         userService.clear();
     }

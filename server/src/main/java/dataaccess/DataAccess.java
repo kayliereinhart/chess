@@ -10,5 +10,6 @@ public interface DataAccess {
 
     void createAuth(AuthData authData);
     AuthData getAuth(String authToken);
+    void deleteAuth(String authToken);
     void clearAuths();
 }

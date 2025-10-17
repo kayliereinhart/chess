@@ -21,6 +21,7 @@ public class Server {
         server.delete("db", this::clear);
         server.post("user", this::register);
         server.post("session", this::login);
+        server.delete("session", this::logout);
 
         server.exception(HttpResponseException.class, this::handleException);
 
@@ -36,6 +37,11 @@ public class Server {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleLogin(requestJson);
         ctx.result(responseJson);
+    }
+
+    private void logout(Context ctx) {
+        String requestJson = ctx.body();
+        userHandler.handleLogout(requestJson);
     }
 
     private void clear(Context ctx) {
