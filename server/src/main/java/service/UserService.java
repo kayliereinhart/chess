@@ -1,7 +1,9 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
+import dataaccess.AuthDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
+import dataaccess.UserDAO;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.HttpResponseException;
@@ -11,14 +13,15 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    private final DataAccess dataAccess = new MemoryDataAccess();
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final AuthDAO authDAO = new MemoryAuthDAO();
 
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
     public AuthData register(UserData userData) throws HttpResponseException {
-        UserData existingUser = dataAccess.getUser(userData.username());
+        UserData existingUser = userDAO.getUser(userData.username());
 
         if (existingUser != null) {
             throw new ForbiddenResponse("already taken");
@@ -28,14 +31,14 @@ public class UserService {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
 
-        dataAccess.createUser(userData);
-        dataAccess.createAuth(authData);
+        userDAO.createUser(userData);
+        authDAO.createAuth(authData);
 
         return authData;
     }
 
     public AuthData login(UserData userData) throws HttpResponseException {
-        UserData existingUser = dataAccess.getUser(userData.username());
+        UserData existingUser = userDAO.getUser(userData.username());
 
         if (userData.username() == null || userData.password() == null) {
             throw new BadRequestResponse("bad request");
@@ -46,22 +49,22 @@ public class UserService {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
 
-        dataAccess.createAuth(authData);
+        authDAO.createAuth(authData);
 
         return authData;
     }
 
     public void logout(String authToken) throws HttpResponseException {
-        AuthData authData = dataAccess.getAuth(authToken);
+        AuthData authData = authDAO.getAuth(authToken);
 
         if (authData == null) {
             throw new UnauthorizedResponse("unauthorized");
         }
-        dataAccess.deleteAuth(authToken);
+        authDAO.deleteAuth(authToken);
     }
 
     public void clear() {
-        dataAccess.clearUsers();
-        dataAccess.clearAuths();
+        userDAO.clearUsers();
+        authDAO.clearAuths();
     }
 }

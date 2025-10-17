@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import io.javalin.http.HttpResponseException;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 
 public class UserHandler {

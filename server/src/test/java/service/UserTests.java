@@ -110,6 +110,11 @@ public class UserTests {
     @Test
     public void positiveLogout() {
         assertDoesNotThrow(() -> userService.logout(existingAuth));
+    }
+
+    @Test
+    public void logoutAlreadyLoggedOut() {
+        assertDoesNotThrow(() -> userService.logout(existingAuth));
         assertThrows(UnauthorizedResponse.class, () -> userService.logout(existingAuth));
     }
 }
