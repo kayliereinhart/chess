@@ -5,6 +5,7 @@ import dataaccess.MemoryDataAccess;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.HttpResponseException;
+import io.javalin.http.UnauthorizedResponse;
 import model.AuthData;
 import model.UserData;
 import java.util.UUID;
@@ -34,6 +35,14 @@ public class UserService {
     }
 
     public AuthData login(UserData userData) throws HttpResponseException {
+        UserData existingUser = dataAccess.getUser(userData.username());
+
+        if (userData.username() == null || userData.password() == null) {
+            throw new BadRequestResponse("bad request");
+        } else if (existingUser == null || !existingUser.password().equals(userData.password())) {
+            throw new UnauthorizedResponse("unauthorized");
+        }
+
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, userData.username());
 
