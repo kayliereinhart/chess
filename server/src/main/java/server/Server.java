@@ -25,7 +25,7 @@ public class Server {
 
     }
 
-    private void register(Context ctx) throws DataAccessException {
+    private void register(Context ctx) throws Exception {
         String requestJson = ctx.body();
         String responseJson = registerHandler.handleRegister(requestJson);
         ctx.result(responseJson);

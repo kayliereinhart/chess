@@ -1,7 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
+import service.AlreadyTakenException;
 import io.javalin.http.Context;
 import java.util.Map;
 

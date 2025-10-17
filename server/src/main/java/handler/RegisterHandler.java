@@ -11,7 +11,7 @@ public class RegisterHandler {
     private final UserService userService = new UserService();
     private final Gson serializer = new Gson();
 
-    public String handleRegister(String requestJson) throws DataAccessException {
+    public String handleRegister(String requestJson) throws Exception {
         UserData registerRequest = serializer.fromJson(requestJson, UserData.class);
         AuthData registrationResult = userService.register(registerRequest);
 
