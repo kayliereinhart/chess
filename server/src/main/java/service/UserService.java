@@ -33,6 +33,15 @@ public class UserService {
         return authData;
     }
 
+    public AuthData login(UserData userData) throws HttpResponseException {
+        String authToken = generateToken();
+        AuthData authData = new AuthData(authToken, userData.username());
+
+        dataAccess.createAuth(authData);
+
+        return authData;
+    }
+
     public void clear() {
         dataAccess.clearUsers();
         dataAccess.clearAuths();

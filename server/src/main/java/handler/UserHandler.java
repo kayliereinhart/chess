@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.javalin.http.HttpResponseException;
 import model.AuthData;
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 
 public class UserHandler {
@@ -16,6 +17,13 @@ public class UserHandler {
         AuthData registrationResult = userService.register(registerRequest);
 
         return serializer.toJson(registrationResult);
+    }
+
+    public String handleLogin(String requestJson) throws HttpResponseException {
+        UserData loginRequest = serializer.fromJson(requestJson, UserData.class);
+        AuthData loginResult = userService.login(loginRequest);
+
+        return serializer.toJson(loginResult);
     }
 
     public void handleClear() {

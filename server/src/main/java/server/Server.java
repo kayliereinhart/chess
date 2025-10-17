@@ -20,6 +20,7 @@ public class Server {
         // Register your endpoints and exception handlers here.
         server.delete("db", this::clear);
         server.post("user", this::register);
+        server.post("session", this::login);
 
         server.exception(HttpResponseException.class, this::handleException);
 
@@ -28,6 +29,12 @@ public class Server {
     private void register(Context ctx) throws HttpResponseException {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleRegister(requestJson);
+        ctx.result(responseJson);
+    }
+
+    private void login(Context ctx) {
+        String requestJson = ctx.body();
+        String responseJson = userHandler.handleLogin(requestJson);
         ctx.result(responseJson);
     }
 
