@@ -1,10 +1,9 @@
 package handler;
 
-import com.google.gson.Gson;
+import service.GameService;
 import gamerequest.CreateGameRequest;
 import gamerequest.JoinGameRequest;
-import io.javalin.http.HttpResponseException;
-import service.GameService;
+import com.google.gson.Gson;
 import java.util.Map;
 
 public class GameHandler {
@@ -12,12 +11,11 @@ public class GameHandler {
     private final GameService gameService = new GameService();
     private final Gson serializer = new Gson();
 
-    public String handleCreate(String authToken, String requestJson) throws HttpResponseException {
-        String gameName = serializer.fromJson(requestJson, CreateGameRequest.class).gameName();
-        CreateGameRequest request = new CreateGameRequest(authToken, gameName);
-        Integer result = gameService.createGame(request);
+    public String handleCreate(String requestJson) {
+        CreateGameRequest request = serializer.fromJson(requestJson, CreateGameRequest.class);
+        Integer gameID = gameService.createGame(request);
 
-        return serializer.toJson(Map.of("gameID", result));
+        return serializer.toJson(Map.of("gameID", gameID));
     }
 
     public String handleList() {
@@ -25,8 +23,7 @@ public class GameHandler {
     }
 
     public void handleJoin(String username, String requestJson) {
-        JoinGameRequest request = serializer.fromJson(requestJson, JoinGameRequest.class);
-        request = new JoinGameRequest(username, request.playerColor(), request.gameID());
+        JoinGameRequest request = serializer.fromJson(requestJson, JoinGameRequest.class).addUsername(username);
         gameService.joinGame(request);
     }
 

@@ -1,11 +1,11 @@
 package server;
 
-import handler.ExceptionHandler;
-import handler.GameHandler;
-import handler.UserHandler;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
+import handler.UserHandler;
+import handler.GameHandler;
+import handler.ExceptionHandler;
 
 public class Server {
 
@@ -17,21 +17,24 @@ public class Server {
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         userHandler = new UserHandler();
-        exceptionHandler = new ExceptionHandler();
         gameHandler = new GameHandler();
+        exceptionHandler = new ExceptionHandler();
 
-        // Register your endpoints and exception handlers here.
+        // Clear endpoint
         server.delete("db", this::clear);
+
+        // User endpoints
         server.post("user", this::register);
         server.post("session", this::login);
         server.delete("session", this::logout);
 
+        // Game endpoints
         server.post("game", this::createGame);
         server.get("game", this::listGames);
         server.put("game", this::joinGame);
 
+        // Exceptions
         server.exception(HttpResponseException.class, this::handleException);
-
     }
 
     private void clear(Context ctx) {
@@ -39,24 +42,24 @@ public class Server {
         gameHandler.handleClear();
     }
 
-    private void register(Context ctx) throws HttpResponseException {
+    private void register(Context ctx) {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleRegister(requestJson);
         ctx.result(responseJson);
     }
 
-    private void login(Context ctx) throws HttpResponseException {
+    private void login(Context ctx) {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleLogin(requestJson);
         ctx.result(responseJson);
     }
 
-    private void logout(Context ctx) throws HttpResponseException {
+    private void logout(Context ctx) {
         String authToken = ctx.header("authorization");
         userHandler.handleLogout(authToken);
     }
 
-    private void createGame(Context ctx) throws HttpResponseException {
+    private void createGame(Context ctx) {
         //Question: If userService only uses authToken and gameService only uses gameName,
         // do I need CreateGameRequest to combine the two?
         //Question: Should gameService throw the UnauthorizedResponse when invalid authToken?
@@ -65,7 +68,7 @@ public class Server {
         userHandler.handleVerifyAuth(authToken);
 
         String requestJson = ctx.body();
-        String responseJson = gameHandler.handleCreate(authToken, requestJson);
+        String responseJson = gameHandler.handleCreate(requestJson);
         ctx.result(responseJson);
     }
 

@@ -9,6 +9,7 @@ import io.javalin.http.ForbiddenResponse;
 import model.GameData;
 import org.junit.jupiter.api.*;
 import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTests {
@@ -27,7 +28,7 @@ public class GameTests {
 
     @Test
     public void positiveClear() {
-        CreateGameRequest request = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest request = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(request);
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
@@ -44,7 +45,7 @@ public class GameTests {
 
     @Test
     public void positiveCreateGame() {
-        CreateGameRequest request = new CreateGameRequest("xyz", "newGame");
+        CreateGameRequest request = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(request);
 
         assertEquals(1, gameID);
@@ -52,10 +53,10 @@ public class GameTests {
 
     @Test
     public void createTwoGames() {
-        CreateGameRequest request = new CreateGameRequest("abc", "newGame1");
+        CreateGameRequest request = new CreateGameRequest("newGame1");
         int gameID1 = gameService.createGame(request);
 
-        request = new CreateGameRequest("xyz", "newGame2");
+        request = new CreateGameRequest("newGame2");
         int gameID2 = gameService.createGame(request);
 
         assertEquals(1, gameID1);
@@ -64,13 +65,13 @@ public class GameTests {
 
     @Test
     public void createGameWithoutName() {
-        CreateGameRequest request = new CreateGameRequest("abc", null);
+        CreateGameRequest request = new CreateGameRequest(null);
         assertThrows(BadRequestResponse.class, () -> gameService.createGame(request));
     }
 
     @Test
     public void positiveListGames() {
-        CreateGameRequest request = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest request = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(request);
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
@@ -81,7 +82,7 @@ public class GameTests {
     }
 
     @Test public void positiveJoinGame() {
-        CreateGameRequest createRequest = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", ChessGame.TeamColor.BLACK, gameID);
@@ -89,7 +90,7 @@ public class GameTests {
     }
 
     @Test public void joinGameInvalidGameID() {
-        CreateGameRequest createRequest = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", ChessGame.TeamColor.BLACK, 5);
@@ -97,7 +98,7 @@ public class GameTests {
     }
 
     @Test public void joinGameNoColor() {
-        CreateGameRequest createRequest = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", null, 5);
@@ -105,7 +106,7 @@ public class GameTests {
     }
 
     @Test public void joinGameColorTaken() {
-        CreateGameRequest createRequest = new CreateGameRequest("abc", "newGame");
+        CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest1 = new JoinGameRequest("user1", ChessGame.TeamColor.BLACK, gameID);

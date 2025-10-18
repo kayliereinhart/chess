@@ -1,12 +1,12 @@
 package dataaccess;
 
-import chess.ChessGame;
 import model.GameData;
+import chess.ChessGame;
 import java.util.Collection;
 
 public interface GameDAO {
-    void createGame(GameData gameData);
     int findNextID();
+    void createGame(GameData gameData);
     Collection<GameData> listGames();
     GameData getGame(int gameID);
     void addPlayer(String username, ChessGame.TeamColor playerColor, int gameID);
