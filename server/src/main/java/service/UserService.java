@@ -67,4 +67,12 @@ public class UserService {
         userDAO.clearUsers();
         authDAO.clearAuths();
     }
+
+    public void verifyAuth(String authToken) {
+        AuthData authData = authDAO.getAuth(authToken);
+
+        if (authData == null) {
+            throw new UnauthorizedResponse("unauthorized");
+        }
+    }
 }

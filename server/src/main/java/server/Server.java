@@ -27,6 +27,7 @@ public class Server {
         server.delete("session", this::logout);
 
         server.post("game", this::createGame);
+        server.get("game", this::listGames);
 
         server.exception(HttpResponseException.class, this::handleException);
 
@@ -34,6 +35,7 @@ public class Server {
 
     private void clear(Context ctx) {
         userHandler.handleClear();
+        gameHandler.handleClear();
     }
 
     private void register(Context ctx) throws HttpResponseException {
@@ -54,9 +56,21 @@ public class Server {
     }
 
     private void createGame(Context ctx) throws HttpResponseException {
+        //Question: If userService only uses authToken and gameService only uses gameName,
+        // do I need CreateGameRequest to combine the two?
+        //Question: Should gameService throw the UnauthorizedResponse when invalid authToken?
+        // if so, how does gameService access the auths HashMap?
         String authToken = ctx.header("authorization");
+        userHandler.handleVerifyAuth(authToken);
+
         String requestJson = ctx.body();
         String responseJson = gameHandler.handleCreate(authToken, requestJson);
+        ctx.result(responseJson);
+    }
+
+    private void listGames(Context ctx) {
+        String authToken = ctx.header("authorization");
+        String responseJson = gameHandler.handleList(authToken);
         ctx.result(responseJson);
     }
 

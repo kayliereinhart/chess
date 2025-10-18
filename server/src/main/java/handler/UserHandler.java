@@ -32,4 +32,8 @@ public class UserHandler {
     public void handleClear() {
         userService.clear();
     }
+
+    public void handleVerifyAuth(String authToken) {
+        userService.verifyAuth(authToken);
+    }
 }

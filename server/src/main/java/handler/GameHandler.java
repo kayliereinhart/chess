@@ -18,4 +18,12 @@ public class GameHandler {
 
         return serializer.toJson(Map.of("gameID", result));
     }
+
+    public String handleList(String authToken) {
+        return "";
+    }
+
+    public void handleClear() {
+        gameService.clear();
+    }
 }
