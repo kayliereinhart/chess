@@ -11,4 +11,14 @@ public class MemoryGameDAO implements GameDAO {
     public void createGame(GameData gameData) {
         games.put(gameData.gameID(), gameData);
     }
+
+    @Override
+    public int findNextID() {
+        int id = 1;
+
+        while (games.containsKey(id)) {
+            id++;
+        }
+        return id;
+    }
 }

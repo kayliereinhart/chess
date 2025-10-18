@@ -11,7 +11,8 @@ public class GameService {
     private final GameDAO gameDAO = new MemoryGameDAO();
 
     public GameData createGame(CreateGameRequest request) {
-        GameData gameData = new GameData(1, null, null, request.gameName(), new ChessGame());
+        int gameID = gameDAO.findNextID();
+        GameData gameData = new GameData(gameID, null, null, request.gameName(), new ChessGame());
         gameDAO.createGame(gameData);
 
         return gameData;
