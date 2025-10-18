@@ -19,8 +19,8 @@ public class GameHandler {
         return serializer.toJson(Map.of("gameID", result));
     }
 
-    public String handleList(String authToken) {
-        return "";
+    public String handleList() {
+        return serializer.toJson(Map.of("games", gameService.listGames()));
     }
 
     public void handleClear() {

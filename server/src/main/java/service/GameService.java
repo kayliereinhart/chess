@@ -4,8 +4,13 @@ import chess.ChessGame;
 import dataaccess.GameDAO;
 import dataaccess.MemoryGameDAO;
 import gamerequest.CreateGameRequest;
+import gameresult.ListGamesResult;
 import io.javalin.http.BadRequestResponse;
 import model.GameData;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class GameService {
 
@@ -20,6 +25,10 @@ public class GameService {
         gameDAO.createGame(gameData);
 
         return gameID;
+    }
+
+    public ListGamesResult listGames() {
+        return new ListGamesResult(new ArrayList<>(gameDAO.listGames()));
     }
 
     public void clear() {

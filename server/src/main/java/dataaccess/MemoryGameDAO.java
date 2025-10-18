@@ -1,6 +1,8 @@
 package dataaccess;
 
 import model.GameData;
+
+import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
@@ -20,6 +22,11 @@ public class MemoryGameDAO implements GameDAO {
             id++;
         }
         return id;
+    }
+
+    @Override
+    public Collection<GameData> listGames() {
+        return games.values();
     }
 
     @Override

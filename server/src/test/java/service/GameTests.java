@@ -1,9 +1,17 @@
 package service;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import gamerequest.CreateGameRequest;
+import gameresult.ListGamesResult;
 import io.javalin.http.BadRequestResponse;
-import io.javalin.http.UnauthorizedResponse;
+import model.GameData;
 import org.junit.jupiter.api.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,6 +22,11 @@ public class GameTests {
     @BeforeAll
     public static void init() {
         gameService = new GameService();
+    }
+
+    @BeforeEach
+    public void setup() {
+        gameService.clear();
     }
 
 //    @Test
@@ -50,8 +63,14 @@ public class GameTests {
     }
 
     @Test
-    public void createGameWithoutAuth() {
-        CreateGameRequest request = new CreateGameRequest(null, "newGame");
-        assertThrows(UnauthorizedResponse.class, () -> gameService.createGame(request));
+    public void positiveListGames() {
+        CreateGameRequest request = new CreateGameRequest("abc", "newGame");
+        int gameID = gameService.createGame(request);
+
+        GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
+        ArrayList<GameData> games = new ArrayList<GameData>();
+        games.add(gameData);
+
+        assertEquals(new ListGamesResult(games), gameService.listGames());
     }
 }

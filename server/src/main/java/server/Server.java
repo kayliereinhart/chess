@@ -70,7 +70,9 @@ public class Server {
 
     private void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
-        String responseJson = gameHandler.handleList(authToken);
+        userHandler.handleVerifyAuth(authToken);
+
+        String responseJson = gameHandler.handleList();
         ctx.result(responseJson);
     }
 
