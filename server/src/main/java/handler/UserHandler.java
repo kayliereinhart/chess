@@ -33,7 +33,7 @@ public class UserHandler {
         userService.clear();
     }
 
-    public void handleVerifyAuth(String authToken) {
-        userService.verifyAuth(authToken);
+    public String handleVerifyAuth(String authToken) {
+        return userService.verifyAuth(authToken);
     }
 }

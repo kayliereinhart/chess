@@ -28,6 +28,7 @@ public class Server {
 
         server.post("game", this::createGame);
         server.get("game", this::listGames);
+        server.put("game", this::joinGame);
 
         server.exception(HttpResponseException.class, this::handleException);
 
@@ -74,6 +75,14 @@ public class Server {
 
         String responseJson = gameHandler.handleList();
         ctx.result(responseJson);
+    }
+
+    private void joinGame(Context ctx) {
+        String authToken = ctx.header("authorization");
+        String username = userHandler.handleVerifyAuth(authToken);
+
+        String requestJson = ctx.body();
+        gameHandler.handleJoin(username, requestJson);
     }
 
     private void handleException(Exception e, Context ctx) {

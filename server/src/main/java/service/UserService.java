@@ -68,11 +68,12 @@ public class UserService {
         authDAO.clearAuths();
     }
 
-    public void verifyAuth(String authToken) {
+    public String verifyAuth(String authToken) {
         AuthData authData = authDAO.getAuth(authToken);
 
         if (authData == null) {
             throw new UnauthorizedResponse("unauthorized");
         }
+        return authData.username();
     }
 }

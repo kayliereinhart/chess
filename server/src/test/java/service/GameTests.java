@@ -1,19 +1,13 @@
 package service;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import gamerequest.CreateGameRequest;
 import gameresult.ListGamesResult;
 import io.javalin.http.BadRequestResponse;
 import model.GameData;
 import org.junit.jupiter.api.*;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTests {
 
@@ -29,12 +23,22 @@ public class GameTests {
         gameService.clear();
     }
 
-//    @Test
-//    public void positiveClear() {
-//        CreateGameRequest request = new CreateGameRequest("xyz", "newGame");
-//        int gameID = gameService.createGame(request);
-//
-//    }
+    @Test
+    public void positiveClear() {
+        CreateGameRequest request = new CreateGameRequest("abc", "newGame");
+        int gameID = gameService.createGame(request);
+
+        GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
+        ArrayList<GameData> games = new ArrayList<GameData>();
+        games.add(gameData);
+
+        assertEquals(new ListGamesResult(games), gameService.listGames());
+
+        gameService.clear();
+
+        assertEquals(0, gameService.listGames().games().size());
+
+    }
 
     @Test
     public void positiveCreateGame() {

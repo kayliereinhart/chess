@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.Collection;
@@ -27,6 +28,25 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public Collection<GameData> listGames() {
         return games.values();
+    }
+
+    @Override
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
+    }
+
+    @Override
+    public void addPlayer(String username, ChessGame.TeamColor playerColor, int gameID) {
+        GameData currentGame = games.get(gameID);
+        GameData newGame;
+
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            newGame = new GameData(gameID, username, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
+        } else {
+            newGame = new GameData(gameID, currentGame.whiteUsername(), username, currentGame.gameName(), currentGame.game());
+        }
+
+        games.put(gameID, newGame);
     }
 
     @Override

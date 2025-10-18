@@ -4,8 +4,10 @@ import chess.ChessGame;
 import dataaccess.GameDAO;
 import dataaccess.MemoryGameDAO;
 import gamerequest.CreateGameRequest;
+import gamerequest.JoinGameRequest;
 import gameresult.ListGamesResult;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -29,6 +31,20 @@ public class GameService {
 
     public ListGamesResult listGames() {
         return new ListGamesResult(new ArrayList<>(gameDAO.listGames()));
+    }
+
+    public void joinGame(JoinGameRequest request) {
+        GameData gameData = gameDAO.getGame(request.gameID());
+
+        if (gameData == null) {
+            throw new BadRequestResponse("bad request");
+        } else if ((request.playerColor() == ChessGame.TeamColor.BLACK && gameData.blackUsername() != null) ||
+                (request.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null)) {
+            throw new ForbiddenResponse("already taken");
+        } else if (request.playerColor() != ChessGame.TeamColor.BLACK && request.playerColor() != ChessGame.TeamColor.WHITE) {
+            throw new BadRequestResponse("bad request");
+        }
+        gameDAO.addPlayer(request.username(), request.playerColor(), request.gameID());
     }
 
     public void clear() {
