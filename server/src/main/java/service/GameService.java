@@ -10,11 +10,11 @@ public class GameService {
 
     private final GameDAO gameDAO = new MemoryGameDAO();
 
-    public GameData createGame(CreateGameRequest request) {
+    public Integer createGame(CreateGameRequest request) {
         int gameID = gameDAO.findNextID();
         GameData gameData = new GameData(gameID, null, null, request.gameName(), new ChessGame());
         gameDAO.createGame(gameData);
 
-        return gameData;
+        return gameID;
     }
 }

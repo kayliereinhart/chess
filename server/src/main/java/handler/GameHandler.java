@@ -3,8 +3,8 @@ package handler;
 import com.google.gson.Gson;
 import gamerequest.CreateGameRequest;
 import io.javalin.http.HttpResponseException;
-import model.GameData;
 import service.GameService;
+import java.util.Map;
 
 public class GameHandler {
 
@@ -14,8 +14,8 @@ public class GameHandler {
     public String handleCreate(String authToken, String requestJson) throws HttpResponseException {
         String gameName = serializer.fromJson(requestJson, CreateGameRequest.class).gameName();
         CreateGameRequest request = new CreateGameRequest(authToken, gameName);
-        GameData result = gameService.createGame(request);
+        Integer result = gameService.createGame(request);
 
-        return serializer.toJson(result);
+        return serializer.toJson(Map.of("gameID", result));
     }
 }
