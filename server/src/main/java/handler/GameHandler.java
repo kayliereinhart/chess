@@ -1,10 +1,12 @@
 package handler;
 
-import service.GameService;
+import java.util.Map;
+
+import com.google.gson.Gson;
+
 import gamerequest.CreateGameRequest;
 import gamerequest.JoinGameRequest;
-import com.google.gson.Gson;
-import java.util.Map;
+import service.GameService;
 
 public class GameHandler {
 

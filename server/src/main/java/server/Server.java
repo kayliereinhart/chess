@@ -3,9 +3,10 @@ package server;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
-import handler.UserHandler;
-import handler.GameHandler;
+
 import handler.ExceptionHandler;
+import handler.GameHandler;
+import handler.UserHandler;
 
 public class Server {
 

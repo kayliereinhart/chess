@@ -1,15 +1,17 @@
 package service;
 
+import java.util.ArrayList;
+
+import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
+
+import chess.ChessGame;
 import dataaccess.GameDAO;
 import dataaccess.MemoryGameDAO;
 import gamerequest.CreateGameRequest;
 import gamerequest.JoinGameRequest;
 import gameresult.ListGamesResult;
 import model.GameData;
-import chess.ChessGame;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ForbiddenResponse;
-import java.util.ArrayList;
 
 public class GameService {
 

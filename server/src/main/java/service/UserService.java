@@ -1,18 +1,20 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ForbiddenResponse;
-import io.javalin.http.HttpResponseException;
-import io.javalin.http.UnauthorizedResponse;
-import model.AuthData;
-import model.UserData;
 import java.util.UUID;
 
+import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.UnauthorizedResponse;
+
+import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
+import model.AuthData;
+import model.UserData;
+
 public class UserService {
+
     private final UserDAO userDAO = new MemoryUserDAO();
     private final AuthDAO authDAO = new MemoryAuthDAO();
 
@@ -20,52 +22,42 @@ public class UserService {
         return UUID.randomUUID().toString();
     }
 
-    public AuthData register(UserData userData) throws HttpResponseException {
-        UserData existingUser = userDAO.getUser(userData.username());
+    public AuthData register(UserData request) {
+        UserData existingUser = userDAO.getUser(request.username());
 
         if (existingUser != null) {
             throw new ForbiddenResponse("already taken");
-        } else if (userData.username() == null || userData.password() == null || userData.email() == null) {
+        } else if (request.username() == null || request.password() == null || request.email() == null) {
             throw new BadRequestResponse("bad request");
         }
         String authToken = generateToken();
-        AuthData authData = new AuthData(authToken, userData.username());
+        AuthData authData = new AuthData(authToken, request.username());
 
-        userDAO.createUser(userData);
+        userDAO.createUser(request);
         authDAO.createAuth(authData);
 
         return authData;
     }
 
-    public AuthData login(UserData userData) throws HttpResponseException {
-        UserData existingUser = userDAO.getUser(userData.username());
+    public AuthData login(UserData request) {
+        UserData userData = userDAO.getUser(request.username());
 
-        if (userData.username() == null || userData.password() == null) {
+        if (request.username() == null || request.password() == null) {
             throw new BadRequestResponse("bad request");
-        } else if (existingUser == null || !existingUser.password().equals(userData.password())) {
+        } else if (userData == null || !userData.password().equals(request.password())) {
             throw new UnauthorizedResponse("unauthorized");
         }
-
         String authToken = generateToken();
-        AuthData authData = new AuthData(authToken, userData.username());
+        AuthData authData = new AuthData(authToken, request.username());
 
         authDAO.createAuth(authData);
 
         return authData;
     }
 
-    public void logout(String authToken) throws HttpResponseException {
-        AuthData authData = authDAO.getAuth(authToken);
-
-        if (authData == null) {
-            throw new UnauthorizedResponse("unauthorized");
-        }
+    public void logout(String authToken) {
+        verifyAuth(authToken);
         authDAO.deleteAuth(authToken);
-    }
-
-    public void clear() {
-        userDAO.clearUsers();
-        authDAO.clearAuths();
     }
 
     public String verifyAuth(String authToken) {
@@ -75,5 +67,10 @@ public class UserService {
             throw new UnauthorizedResponse("unauthorized");
         }
         return authData.username();
+    }
+
+    public void clear() {
+        userDAO.clearUsers();
+        authDAO.clearAuths();
     }
 }

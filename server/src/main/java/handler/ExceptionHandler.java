@@ -1,10 +1,10 @@
 package handler;
 
-import com.google.gson.Gson;
-import io.javalin.http.HttpResponseException;
-import io.javalin.http.Context;
-
 import java.util.Map;
+
+import com.google.gson.Gson;
+import io.javalin.http.Context;
+import io.javalin.http.HttpResponseException;
 
 public class ExceptionHandler {
 

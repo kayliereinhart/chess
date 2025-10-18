@@ -1,16 +1,17 @@
 package service;
 
+import java.util.ArrayList;
+
+import io.javalin.http.BadRequestResponse;
+import io.javalin.http.ForbiddenResponse;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import chess.ChessGame;
 import gamerequest.CreateGameRequest;
 import gamerequest.JoinGameRequest;
 import gameresult.ListGamesResult;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ForbiddenResponse;
 import model.GameData;
-import org.junit.jupiter.api.*;
-import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTests {
 
@@ -32,7 +33,7 @@ public class GameTests {
         int gameID = gameService.createGame(request);
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
-        ArrayList<GameData> games = new ArrayList<GameData>();
+        ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
         assertEquals(new ListGamesResult(games), gameService.listGames());
@@ -75,13 +76,14 @@ public class GameTests {
         int gameID = gameService.createGame(request);
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
-        ArrayList<GameData> games = new ArrayList<GameData>();
+        ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
         assertEquals(new ListGamesResult(games), gameService.listGames());
     }
 
-    @Test public void positiveJoinGame() {
+    @Test
+    public void positiveJoinGame() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
@@ -89,23 +91,26 @@ public class GameTests {
         assertDoesNotThrow(() -> gameService.joinGame(joinRequest));
     }
 
-    @Test public void joinGameInvalidGameID() {
+    @Test
+    public void joinGameInvalidGameID() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(createRequest);
+        gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", ChessGame.TeamColor.BLACK, 5);
         assertThrows(BadRequestResponse.class, () -> gameService.joinGame(joinRequest));
     }
 
-    @Test public void joinGameNoColor() {
+    @Test
+    public void joinGameNoColor() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(createRequest);
+        gameService.createGame(createRequest);
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", null, 5);
         assertThrows(BadRequestResponse.class, () -> gameService.joinGame(joinRequest));
     }
 
-    @Test public void joinGameColorTaken() {
+    @Test
+    public void joinGameColorTaken() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
         int gameID = gameService.createGame(createRequest);
 
