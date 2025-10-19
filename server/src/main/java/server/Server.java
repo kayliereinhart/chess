@@ -74,6 +74,7 @@ public class Server {
     }
 
     private void listGames(Context ctx) {
+        // Do I need ListGamesResult object? Can I use Map.of instead?
         String authToken = ctx.header("authorization");
         userHandler.handleVerifyAuth(authToken);
 

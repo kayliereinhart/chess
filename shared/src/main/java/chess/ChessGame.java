@@ -1,9 +1,9 @@
 package chess;
 
-import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -45,6 +45,22 @@ public class ChessGame {
         BLACK
     }
 
+    public void validateMove(Collection<ChessMove> valid, ChessMove move, ChessPiece piece) {
+        ChessBoard testBoard = board.clone();
+        testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
+        testBoard.addPiece(move.getStartPosition(), null);
+
+        if (!boardInCheck(piece.getTeamColor(), testBoard)) {
+            valid.add(move);
+        }
+    }
+
+    public void validateMoves(Collection<ChessMove> moves, Collection<ChessMove> valid, ChessPiece piece) {
+        for (ChessMove move : moves) {
+            validateMove(valid, move, piece);
+        }
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -61,15 +77,8 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> valid = new ArrayList<>();
 
-        for (ChessMove move : moves) {
-            ChessBoard testBoard = board.clone();
-            testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
-            testBoard.addPiece(move.getStartPosition(), null);
+        validateMoves(moves, valid, piece);
 
-            if (!boardInCheck(piece.getTeamColor(), testBoard)) {
-                valid.add(move);
-            }
-        }
         return valid;
     }
 
@@ -82,6 +91,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
         ChessPiece piece = board.getPiece(move.getStartPosition());
+        // Change this so it calls a make move method from the ChessBoard class
 
         if (piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN &&
                 move.getPromotionPiece() != null) {
