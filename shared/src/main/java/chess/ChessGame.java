@@ -173,17 +173,14 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {
-            //loop through each position on the board
-            //check if there is a valid move that would result in no more check
+            // Change so this calls ChessBoard make move method
+
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
                     ChessPosition pos = new ChessPosition(i, j);
-                    Collection<ChessMove> moves = null;
+                    Collection<ChessMove> moves = validMoves(pos);
 
-                    if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor) {
-                        moves = validMoves(pos);
-                    }
-                    if (moves != null) {
+                    if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor && moves != null) {
                         for (ChessMove move : moves) {
                             ChessBoard testBoard = board.clone();
                             testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(pos));
