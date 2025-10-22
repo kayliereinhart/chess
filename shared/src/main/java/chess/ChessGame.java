@@ -45,10 +45,8 @@ public class ChessGame {
     }
 
     private void validateMove(Collection<ChessMove> valid, ChessMove move, ChessPiece piece) {
-        // Change this so that it calls board make move method(movePiece method)
         ChessBoard testBoard = board.clone();
-        testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
-        testBoard.addPiece(move.getStartPosition(), null);
+        testBoard.movePiece(move);
 
         if (!boardInCheck(piece.getTeamColor(), testBoard)) {
             valid.add(move);
@@ -108,12 +106,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         ChessPiece piece = getMovePiece(move);
-        // Change this so it calls a make move method from the ChessBoard class
 
         if (validMoves != null && validMoves.contains(move) && piece.getTeamColor() == teamTurn) {
-            board.addPiece(move.getEndPosition(), piece);
-            board.addPiece(move.getStartPosition(), null);
-
+            board.movePiece(move);
             changeTurn();
         } else {
             throw new InvalidMoveException("Invalid Move");
@@ -166,11 +161,9 @@ public class ChessGame {
         return boardInCheck(teamColor, board);
     }
 
-    private boolean moveEscapesCheck(ChessMove move, ChessPosition position, TeamColor team) {
-        // Change so this calls ChessBoard make move method
+    private boolean moveEscapesCheck(ChessMove move, TeamColor team) {
         ChessBoard testBoard = board.clone();
-        testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(position));
-        testBoard.addPiece(position, null);
+        testBoard.movePiece(move);
 
         return !boardInCheck(team, testBoard);
     }
@@ -180,7 +173,7 @@ public class ChessGame {
 
         if (board.getPiece(position) != null && board.getPiece(position).getTeamColor() == team && moves != null) {
             for (ChessMove move : moves) {
-                if (moveEscapesCheck(move, position, team)) {
+                if (moveEscapesCheck(move, team)) {
                     return true;
                 }
             }

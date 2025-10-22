@@ -1,7 +1,7 @@
 package chess;
 
-import java.util.Arrays;
 import java.util.Objects;
+import java.util.Arrays;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 public class ChessBoard implements Cloneable {
 
-    private final ChessPiece[][] board = new ChessPiece[8][8];
+    private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
         
@@ -36,6 +36,18 @@ public class ChessBoard implements Cloneable {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board[position.getRow() - 1][position.getColumn() - 1];
+    }
+
+    public void movePiece(ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece piece = getPiece(startPosition);
+
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+        board[endPosition.getRow() - 1][endPosition.getColumn() - 1] = piece;
+        board[startPosition.getRow() - 1][startPosition.getColumn() - 1] = null;
     }
 
     /**
@@ -65,18 +77,19 @@ public class ChessBoard implements Cloneable {
         }
     }
 
-    public ChessPosition findKing(ChessGame.TeamColor color) {
-        ChessPosition pos;
-        ChessPiece piece;
+    private boolean isKingPosition(ChessPosition position, ChessGame.TeamColor team) {
+        ChessPiece piece = getPiece(position);
 
+        return (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == team);
+    }
+
+    public ChessPosition findKing(ChessGame.TeamColor team) {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
-                pos = new ChessPosition(i, j);
-                piece = getPiece(pos);
+                ChessPosition position = new ChessPosition(i, j);
 
-                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING &&
-                        piece.getTeamColor() == color) {
-                    return pos;
+                if (isKingPosition(position, team)) {
+                    return position;
                 }
             }
         }
@@ -85,19 +98,18 @@ public class ChessBoard implements Cloneable {
 
     @Override
     public String toString() {
-        String str = "";
+        StringBuilder str = new StringBuilder();
 
         for (int i = 0; i <= 7; i++) {
             for (int j = 0; j <= 7; j++) {
                 if (board[i][j] == null) {
-                    str += "null";
+                    str.append("null");
                 } else {
-                    str += board[i][j].toString();
+                    str.append(board[i][j].toString());
                 }
             }
         }
-
-        return str;
+        return str.toString();
     }
 
     @Override
@@ -116,11 +128,16 @@ public class ChessBoard implements Cloneable {
 
     @Override
     public ChessBoard clone() {
-        ChessBoard clone = new ChessBoard();
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            clone.board = new ChessPiece[8][8];
 
-        for (int i = 0; i < 8; i++) {
-            clone.board[i] = Arrays.copyOf(board[i], 8);
+            for (int i = 0; i < 8; i++) {
+                clone.board[i] = Arrays.copyOf(board[i], 8);
+            }
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
-        return clone;
     }
 }
