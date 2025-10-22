@@ -45,7 +45,7 @@ public class ChessGame {
     }
 
     private void validateMove(Collection<ChessMove> valid, ChessMove move, ChessPiece piece) {
-        // Change this so that it calls board make move method
+        // Change this so that it calls board make move method(movePiece method)
         ChessBoard testBoard = board.clone();
         testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(move.getStartPosition()));
         testBoard.addPiece(move.getStartPosition(), null);
@@ -165,6 +165,28 @@ public class ChessGame {
         return boardInCheck(teamColor, board);
     }
 
+    private boolean moveEscapesCheck(ChessMove move, ChessPosition pos, TeamColor teamColor) {
+        // Change so this calls ChessBoard make move method
+        ChessBoard testBoard = board.clone();
+        testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(pos));
+        testBoard.addPiece(pos, null);
+
+        return !boardInCheck(teamColor, testBoard);
+    }
+
+    private boolean pieceEscapesCheck(ChessPosition pos, TeamColor teamColor) {
+        Collection<ChessMove> moves = validMoves(pos);
+
+        if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor && moves != null) {
+            for (ChessMove move : moves) {
+                if (moveEscapesCheck(move, pos, teamColor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -173,23 +195,12 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {
-            // Change so this calls ChessBoard make move method
-
             for (int i = 1; i <= 8; i++) {
                 for (int j = 1; j <= 8; j++) {
                     ChessPosition pos = new ChessPosition(i, j);
-                    Collection<ChessMove> moves = validMoves(pos);
 
-                    if (board.getPiece(pos) != null && board.getPiece(pos).getTeamColor() == teamColor && moves != null) {
-                        for (ChessMove move : moves) {
-                            ChessBoard testBoard = board.clone();
-                            testBoard.addPiece(move.getEndPosition(), testBoard.getPiece(pos));
-                            testBoard.addPiece(pos, null);
-
-                            if (!boardInCheck(teamColor, testBoard)) {
-                                return false;
-                            }
-                        }
+                    if (pieceEscapesCheck(pos, teamColor)) {
+                        return false;
                     }
                 }
             }
