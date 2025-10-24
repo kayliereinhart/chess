@@ -2,6 +2,7 @@ package service;
 
 import java.util.ArrayList;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 
@@ -42,7 +43,12 @@ public class GameService {
                 (request.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null)) {
             throw new ForbiddenResponse("already taken");
         }
-        gameDAO.addPlayer(request.username(), request.playerColor(), request.gameID());
+
+        try {
+            gameDAO.addPlayer(request.username(), request.playerColor(), request.gameID());
+        } catch (DataAccessException e) {
+            throw new BadRequestResponse("bad request");
+        }
     }
 
     public void clear() {

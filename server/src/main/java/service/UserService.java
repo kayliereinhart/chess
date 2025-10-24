@@ -2,14 +2,11 @@ package service;
 
 import java.util.UUID;
 
+import dataaccess.*;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.UnauthorizedResponse;
 
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 
@@ -56,8 +53,11 @@ public class UserService {
     }
 
     public void logout(String authToken) {
-        verifyAuth(authToken);
-        authDAO.deleteAuth(authToken);
+        try {
+            authDAO.deleteAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new UnauthorizedResponse("unauthorized");
+        }
     }
 
     public String verifyAuth(String authToken) {
