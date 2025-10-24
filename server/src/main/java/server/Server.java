@@ -62,10 +62,6 @@ public class Server {
     }
 
     private void createGame(Context ctx) {
-        //Question: If userService only uses authToken and gameService only uses gameName,
-        // do I need CreateGameRequest to combine the two?
-        //Question: Should gameService throw the UnauthorizedResponse when invalid authToken?
-        // if so, how does gameService access the auths HashMap?
         String authToken = ctx.header("authorization");
         userHandler.handleVerifyAuth(authToken);
 
@@ -75,7 +71,6 @@ public class Server {
     }
 
     private void listGames(Context ctx) {
-        // Do I need ListGamesResult object? Can I use Map.of instead?
         String authToken = ctx.header("authorization");
         userHandler.handleVerifyAuth(authToken);
 
