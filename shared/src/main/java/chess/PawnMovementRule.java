@@ -52,7 +52,6 @@ public class PawnMovementRule extends BaseMovementRule {
 
     public void calculatePawnMoves(ChessBoard board, ChessPosition position, Collection<ChessMove> moves) {
         int row = position.getRow();
-        int col = position.getColumn();
         ChessGame.TeamColor color = board.getPiece(position).getTeamColor();
         int direction = 1;
         boolean firstMove = false;
@@ -73,7 +72,7 @@ public class PawnMovementRule extends BaseMovementRule {
 
     @Override
     public HashSet<ChessMove> moves(ChessBoard board, ChessPosition position) {
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
+        HashSet<ChessMove> moves = new HashSet<>();
         calculatePawnMoves(board, position, moves);
 
         return moves;
