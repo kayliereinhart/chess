@@ -38,12 +38,14 @@ public class PawnMovementRule extends BaseMovementRule {
         int col = position.getColumn();
         ChessPosition endPosition = new ChessPosition(row, col + 1);
 
-        if (inBounds(row, col + 1) && board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
+        if (inBounds(row, col + 1) && board.getPiece(endPosition) != null
+                && board.getPiece(endPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
             addPawnMoves(position, endPosition, promote, moves);
         }
 
         endPosition = new ChessPosition(row, col - 1);
-        if (inBounds(row, col - 1) && board.getPiece(endPosition) != null && board.getPiece(endPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
+        if (inBounds(row, col - 1) && board.getPiece(endPosition) != null
+                && board.getPiece(endPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
             addPawnMoves(position, endPosition, promote, moves);
         }
     }
