@@ -8,14 +8,14 @@ public class KingMovementRule extends BaseMovementRule {
     public HashSet<ChessMove> moves(ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> moves = new HashSet<ChessMove>();
 
-        calculateMoves(board, position, 1, 1, false, moves);
-        calculateMoves(board, position, -1, 1, false, moves);
-        calculateMoves(board, position, 1, -1, false, moves);
-        calculateMoves(board, position, -1, -1, false, moves);
-        calculateMoves(board, position, 1, 0, false, moves);
-        calculateMoves(board, position, -1, 0, false, moves);
-        calculateMoves(board, position, 0, 1, false, moves);
-        calculateMoves(board, position, 0, -1, false, moves);
+        calculateMoves(board, position, moves, 1, 1, false);
+        calculateMoves(board, position, moves, -1, 1, false);
+        calculateMoves(board, position, moves, 1, -1, false);
+        calculateMoves(board, position, moves, -1, -1, false);
+        calculateMoves(board, position, moves, 1, 0, false);
+        calculateMoves(board, position, moves, -1, 0, false);
+        calculateMoves(board, position, moves, 0, 1, false);
+        calculateMoves(board, position, moves, 0, -1, false);
 
         return moves;
     }

@@ -8,14 +8,14 @@ public class KnightMovementRule extends BaseMovementRule {
     public HashSet<ChessMove> moves(ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> moves = new HashSet<ChessMove>();
 
-        calculateMoves(board, position, 2, 1, false, moves);
-        calculateMoves(board, position, 2, -1, false, moves);
-        calculateMoves(board, position, -2, 1, false, moves);
-        calculateMoves(board, position, -2, -1, false, moves);
-        calculateMoves(board, position, 1, 2, false, moves);
-        calculateMoves(board, position, 1, -2, false, moves);
-        calculateMoves(board, position, -1, 2, false, moves);
-        calculateMoves(board, position, -1, -2, false, moves);
+        calculateMoves(board, position, moves, 2, 1, false);
+        calculateMoves(board, position, moves, 2, -1, false);
+        calculateMoves(board, position, moves, -2, 1, false);
+        calculateMoves(board, position, moves, -2, -1, false);
+        calculateMoves(board, position, moves, 1, 2, false);
+        calculateMoves(board, position, moves, 1, -2, false);
+        calculateMoves(board, position, moves, -1, 2, false);
+        calculateMoves(board, position, moves, -1, -2, false);
 
         return moves;
     }

@@ -8,10 +8,10 @@ public class RookMovementRule extends BaseMovementRule{
     public HashSet<ChessMove> moves(ChessBoard board, ChessPosition position) {
         HashSet<ChessMove> moves = new HashSet<ChessMove>();
 
-        calculateMoves(board, position, 1, 0, true, moves);
-        calculateMoves(board, position, -1, 0, true, moves);
-        calculateMoves(board, position, 0, 1, true, moves);
-        calculateMoves(board, position, 0, -1, true, moves);
+        calculateMoves(board, position, moves, 1, 0, true);
+        calculateMoves(board, position, moves, -1, 0, true);
+        calculateMoves(board, position, moves, 0, 1, true);
+        calculateMoves(board, position, moves, 0, -1, true);
 
         return moves;
     }
