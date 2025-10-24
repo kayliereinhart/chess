@@ -6,7 +6,7 @@ public class QueenMovementRule extends BaseMovementRule{
 
     @Override
     public HashSet<ChessMove> moves(ChessBoard board, ChessPosition position) {
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
+        HashSet<ChessMove> moves = new HashSet<>();
 
         calculateMoves(board, position, moves, 1, 1, true);
         calculateMoves(board, position, moves, -1, 1, true);
