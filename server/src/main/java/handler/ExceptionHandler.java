@@ -11,7 +11,12 @@ public class ExceptionHandler {
     public void handle(Exception e, Context ctx) {
         String body = new Gson().toJson(Map.of("message",
                 String.format("Error: %s", e.getMessage()), "success", false));
-        ctx.status(((HttpResponseException) e).getStatus());
+
+        if (e instanceof HttpResponseException httpEx) {
+            ctx.status(httpEx.getStatus());
+        } else {
+            ctx.status(500);
+        }
         ctx.json(body);
     }
 }

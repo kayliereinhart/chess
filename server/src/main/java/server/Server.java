@@ -35,6 +35,7 @@ public class Server {
         server.put("game", this::joinGame);
 
         // Exceptions
+        server.exception(Exception.class, this::handleException);
         server.exception(HttpResponseException.class, this::handleException);
     }
 
