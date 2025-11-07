@@ -45,19 +45,23 @@ public class UserService {
     }
 
     public AuthData login(UserData request) throws DataAccessException {
-        UserData userData = userDAO.getUser(request.username());
+        try {
+            UserData userData = userDAO.getUser(request.username());
 
-        if (request.username() == null || request.password() == null) {
+            if (request.password() == null) {
+                throw new BadRequestResponse("bad request");
+            } else if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
+                throw new UnauthorizedResponse("unauthorized");
+            }
+            String authToken = generateToken();
+            AuthData authData = new AuthData(authToken, request.username());
+
+            authDAO.createAuth(authData);
+
+            return authData;
+        } catch (DataAccessException e) {
             throw new BadRequestResponse("bad request");
-        } else if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
-            throw new UnauthorizedResponse("unauthorized");
         }
-        String authToken = generateToken();
-        AuthData authData = new AuthData(authToken, request.username());
-
-        authDAO.createAuth(authData);
-
-        return authData;
     }
 
     public void logout(String authToken) {

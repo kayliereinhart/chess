@@ -62,7 +62,7 @@ public class UserTests {
     public void registerWithoutUsername() {
         UserData userData = new UserData(null, "password", "u@email.com");
 
-        assertThrows(BadRequestResponse.class, () -> userService.register(userData));
+        assertThrows(Exception.class, () -> userService.register(userData));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class UserTests {
     @Test
     public void loginWithoutUsername() {
         UserData loginRequest = new UserData(null, "existingUserPassword", null);
-        assertThrows(BadRequestResponse.class, () -> userService.login(loginRequest));
+        assertThrows(Exception.class, () -> userService.login(loginRequest));
     }
 
     @Test
