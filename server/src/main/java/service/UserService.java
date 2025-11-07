@@ -3,6 +3,7 @@ package service;
 import java.util.UUID;
 
 import dataaccess.*;
+import encrypter.Encrypter;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.UnauthorizedResponse;
@@ -14,6 +15,7 @@ public class UserService {
 
     private final AuthDAO authDAO = new MemoryAuthDAO();
     private final UserDAO userDAO;
+    private final Encrypter encrypter = new Encrypter();
 
     public UserService() throws DataAccessException {
         userDAO = new SQLUserDAO();
@@ -34,7 +36,9 @@ public class UserService {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, request.username());
 
-        userDAO.createUser(request);
+        String hashedPassword = encrypter.encryptPassword(request.password());
+
+        userDAO.createUser(request.replacePassword(hashedPassword));
         authDAO.createAuth(authData);
 
         return authData;
@@ -45,7 +49,7 @@ public class UserService {
 
         if (request.username() == null || request.password() == null) {
             throw new BadRequestResponse("bad request");
-        } else if (userData == null || !userData.password().equals(request.password())) {
+        } else if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
             throw new UnauthorizedResponse("unauthorized");
         }
         String authToken = generateToken();
