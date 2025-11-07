@@ -12,14 +12,18 @@ import model.UserData;
 
 public class UserService {
 
-    private final UserDAO userDAO = new MemoryUserDAO();
     private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final UserDAO userDAO;
+
+    public UserService() throws DataAccessException {
+        userDAO = new SQLUserDAO();
+    }
 
     private String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    public AuthData register(UserData request) {
+    public AuthData register(UserData request) throws DataAccessException{
         UserData existingUser = userDAO.getUser(request.username());
 
         if (existingUser != null) {
@@ -36,7 +40,7 @@ public class UserService {
         return authData;
     }
 
-    public AuthData login(UserData request) {
+    public AuthData login(UserData request) throws DataAccessException {
         UserData userData = userDAO.getUser(request.username());
 
         if (request.username() == null || request.password() == null) {
@@ -69,7 +73,7 @@ public class UserService {
         return authData.username();
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         userDAO.clearUsers();
         authDAO.clearAuths();
     }

@@ -12,10 +12,10 @@ public class SQLUserDAO implements UserDAO {
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS users (
-            'username' varchar(100) NOT NULL,
-            'password' varchar(100) NOT NULL,
-            'email' varchar(100) NOT NULL,
-            PRIMARY KEY ('username')
+            username varchar(256) NOT NULL,
+            password varchar(256) NOT NULL,
+            email varchar(256) NOT NULL,
+            PRIMARY KEY (username)
             )
             """
     };
@@ -66,7 +66,7 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM pet WHERE username=?";
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {

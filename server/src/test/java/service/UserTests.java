@@ -18,34 +18,36 @@ public class UserTests {
 
     @BeforeAll
     public static void init() {
-        userService = new UserService();
+        userService = assertDoesNotThrow(UserService::new);
         existingUser = new UserData("ExistingUser", "existingUserPassword", "eu@mail.com");
         newUser = new UserData("NewUser", "newUserPassword", "nu@mail.com");
     }
 
     @BeforeEach
     public void setup() {
-        userService.clear();
-        AuthData registerResponse = userService.register(existingUser);
+        assertDoesNotThrow(() -> userService.clear());
+        AuthData registerResponse = assertDoesNotThrow(() -> userService.register(existingUser));
         existingAuth = registerResponse.authToken();
     }
 
     @Test
     public void positiveClear() {
-        userService.register(newUser);
+        assertDoesNotThrow(() -> userService.register(newUser));
 
         assertThrows(ForbiddenResponse.class, () -> userService.register(existingUser));
         assertThrows(ForbiddenResponse.class, () -> userService.register(newUser));
 
-        userService.clear();
+        assertDoesNotThrow(() -> userService.clear());
 
-        assertNotNull(userService.register(existingUser));
-        assertNotNull(userService.register(newUser));
+        AuthData registerResponse1 = assertDoesNotThrow(() -> userService.register(existingUser));
+        AuthData registerResponse2 = assertDoesNotThrow(() -> userService.register(newUser));
+        assertNotNull(registerResponse1);
+        assertNotNull(registerResponse2);
     }
 
     @Test
     public void positiveRegister() {
-        AuthData authData = userService.register(newUser);
+        AuthData authData = assertDoesNotThrow(() -> userService.register(newUser));
 
         assertEquals(newUser.username(), authData.username());
         assertEquals(String.class, authData.authToken().getClass());

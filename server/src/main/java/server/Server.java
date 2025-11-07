@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.DataAccessException;
 import io.javalin.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
@@ -17,9 +18,14 @@ public class Server {
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
-        userHandler = new UserHandler();
-        gameHandler = new GameHandler();
         exceptionHandler = new ExceptionHandler();
+
+        try {
+            userHandler = new UserHandler();
+            gameHandler = new GameHandler();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(String.format("Could not initialize database: %s", e.getMessage()));
+        }
 
         // Clear endpoint
         server.delete("db", this::clear);
@@ -39,18 +45,18 @@ public class Server {
         server.exception(HttpResponseException.class, this::handleException);
     }
 
-    private void clear(Context ctx) {
+    private void clear(Context ctx) throws DataAccessException {
         userHandler.handleClear();
         gameHandler.handleClear();
     }
 
-    private void register(Context ctx) {
+    private void register(Context ctx) throws DataAccessException {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleRegister(requestJson);
         ctx.result(responseJson);
     }
 
-    private void login(Context ctx) {
+    private void login(Context ctx) throws DataAccessException {
         String requestJson = ctx.body();
         String responseJson = userHandler.handleLogin(requestJson);
         ctx.result(responseJson);

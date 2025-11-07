@@ -2,23 +2,28 @@ package handler;
 
 import com.google.gson.Gson;
 
+import dataaccess.DataAccessException;
 import model.UserData;
 import model.AuthData;
 import service.UserService;
 
 public class UserHandler {
 
-    private final UserService userService = new UserService();
     private final Gson serializer = new Gson();
+    private final UserService userService;
 
-    public String handleRegister(String requestJson) {
+    public UserHandler() throws DataAccessException {
+        userService = new UserService();
+    }
+
+    public String handleRegister(String requestJson) throws DataAccessException {
         UserData request = serializer.fromJson(requestJson, UserData.class);
         AuthData result = userService.register(request);
 
         return serializer.toJson(result);
     }
 
-    public String handleLogin(String requestJson) {
+    public String handleLogin(String requestJson) throws DataAccessException {
         UserData request = serializer.fromJson(requestJson, UserData.class);
         AuthData result = userService.login(request);
 
@@ -33,7 +38,7 @@ public class UserHandler {
         return userService.verifyAuth(authToken);
     }
 
-    public void handleClear() {
+    public void handleClear() throws DataAccessException{
         userService.clear();
     }
 }
