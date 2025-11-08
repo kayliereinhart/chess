@@ -10,7 +10,7 @@ public class MemoryGameDAO implements GameDAO {
 
     private final HashMap<Integer, GameData> games = new HashMap<>();
 
-    public int findNextID() {
+    private int findNextID() {
         int id = 1;
 
         while (games.containsKey(id)) {
@@ -20,8 +20,11 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void createGame(GameData gameData) {
-        games.put(gameData.gameID(), gameData);
+    public int createGame(GameData gameData) {
+        int id = findNextID();
+        games.put(id, gameData.addID(id));
+
+        return id;
     }
 
     @Override

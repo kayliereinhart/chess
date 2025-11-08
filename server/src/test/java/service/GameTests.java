@@ -24,41 +24,43 @@ public class GameTests {
 
     @BeforeEach
     public void setup() {
-        gameService.clear();
+        assertDoesNotThrow(() -> gameService.clear());
     }
 
     @Test
     public void positiveClear() {
         CreateGameRequest request = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(request);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(request));
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
         ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
-        assertEquals(new ListGamesResult(games), gameService.listGames());
+        ListGamesResult result = assertDoesNotThrow(() -> gameService.listGames());
+        assertEquals(new ListGamesResult(games), result);
 
-        gameService.clear();
+        assertDoesNotThrow(() -> gameService.clear());
 
-        assertEquals(0, gameService.listGames().games().size());
+        result = assertDoesNotThrow(() -> gameService.listGames());
+        assertEquals(0, result.games().size());
 
     }
 
     @Test
     public void positiveCreateGame() {
         CreateGameRequest request = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(request);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(request));
 
         assertEquals(1, gameID);
     }
 
     @Test
     public void createTwoGames() {
-        CreateGameRequest request = new CreateGameRequest("newGame1");
-        int gameID1 = gameService.createGame(request);
+        CreateGameRequest request1 = new CreateGameRequest("newGame1");
+        int gameID1 = assertDoesNotThrow(() -> gameService.createGame(request1));
 
-        request = new CreateGameRequest("newGame2");
-        int gameID2 = gameService.createGame(request);
+        CreateGameRequest request2 = new CreateGameRequest("newGame2");
+        int gameID2 = assertDoesNotThrow(() -> gameService.createGame(request2));
 
         assertEquals(1, gameID1);
         assertEquals(2, gameID2);
@@ -73,19 +75,20 @@ public class GameTests {
     @Test
     public void positiveListGames() {
         CreateGameRequest request = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(request);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(request));
 
         GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
         ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
-        assertEquals(new ListGamesResult(games), gameService.listGames());
+        ListGamesResult result = assertDoesNotThrow(() -> gameService.listGames());
+        assertEquals(new ListGamesResult(games), result);
     }
 
     @Test
     public void positiveJoinGame() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(createRequest);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(createRequest));
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", ChessGame.TeamColor.BLACK, gameID);
         assertDoesNotThrow(() -> gameService.joinGame(joinRequest));
@@ -94,7 +97,7 @@ public class GameTests {
     @Test
     public void joinGameInvalidGameID() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        gameService.createGame(createRequest);
+        assertDoesNotThrow(() -> gameService.createGame(createRequest));
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", ChessGame.TeamColor.BLACK, 5);
         assertThrows(BadRequestResponse.class, () -> gameService.joinGame(joinRequest));
@@ -103,7 +106,7 @@ public class GameTests {
     @Test
     public void joinGameNoColor() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        gameService.createGame(createRequest);
+        assertDoesNotThrow(() -> gameService.createGame(createRequest));
 
         JoinGameRequest joinRequest = new JoinGameRequest("user", null, 5);
         assertThrows(BadRequestResponse.class, () -> gameService.joinGame(joinRequest));
@@ -112,7 +115,7 @@ public class GameTests {
     @Test
     public void joinGameColorTaken() {
         CreateGameRequest createRequest = new CreateGameRequest("newGame");
-        int gameID = gameService.createGame(createRequest);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(createRequest));
 
         JoinGameRequest joinRequest1 = new JoinGameRequest("user1", ChessGame.TeamColor.BLACK, gameID);
         assertDoesNotThrow(() -> gameService.joinGame(joinRequest1));

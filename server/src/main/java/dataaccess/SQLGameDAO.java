@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.ChessGame;
-import gameresult.ListGamesResult;
 import model.GameData;
 import com.google.gson.Gson;
 
@@ -47,7 +46,7 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 for (int i = 0; i < params.length; i++) {
@@ -59,6 +58,12 @@ public class SQLGameDAO implements GameDAO {
                     }
                 }
                 ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));
@@ -76,9 +81,9 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public void createGame(GameData gameData) throws DataAccessException {
-        var statement = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(statement, gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
+    public int createGame(GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        return executeUpdate(statement, gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
                 gameData.gameName(), gameData.game());
     }
 

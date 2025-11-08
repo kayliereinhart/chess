@@ -18,22 +18,19 @@ public class GameService {
 
     private final GameDAO gameDAO = new MemoryGameDAO();
 
-    public Integer createGame(CreateGameRequest request) {
+    public Integer createGame(CreateGameRequest request) throws DataAccessException {
         if (request.gameName() == null) {
             throw new BadRequestResponse("bad request");
         }
-        int gameID = gameDAO.findNextID();
-        GameData gameData = new GameData(gameID, null, null, request.gameName(), new ChessGame());
-        gameDAO.createGame(gameData);
-
-        return gameID;
+        GameData gameData = new GameData(null, null, null, request.gameName(), new ChessGame());
+        return gameDAO.createGame(gameData);
     }
 
-    public ListGamesResult listGames() {
+    public ListGamesResult listGames() throws DataAccessException {
         return new ListGamesResult(new ArrayList<>(gameDAO.listGames()));
     }
 
-    public void joinGame(JoinGameRequest request) {
+    public void joinGame(JoinGameRequest request) throws DataAccessException {
         GameData gameData = gameDAO.getGame(request.gameID());
 
         if (gameData == null || (request.playerColor() != ChessGame.TeamColor.BLACK &&
@@ -51,7 +48,7 @@ public class GameService {
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameDAO.clearGames();
     }
 }
