@@ -11,8 +11,12 @@ import service.GameService;
 
 public class GameHandler {
 
-    private final GameService gameService = new GameService();
+    private final GameService gameService;
     private final Gson serializer = new Gson();
+
+    public GameHandler() throws DataAccessException {
+        gameService = new GameService();
+    }
 
     public String handleCreate(String requestJson) throws DataAccessException {
         CreateGameRequest request = serializer.fromJson(requestJson, CreateGameRequest.class);

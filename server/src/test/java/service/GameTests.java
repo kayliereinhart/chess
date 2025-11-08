@@ -19,7 +19,7 @@ public class GameTests {
 
     @BeforeAll
     public static void init() {
-        gameService = new GameService();
+        gameService = assertDoesNotThrow(GameService::new);
     }
 
     @BeforeEach

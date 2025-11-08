@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import gsonbuilder.GameGsonBuilder;
 import model.GameData;
 import com.google.gson.Gson;
 
@@ -12,12 +13,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
+
 public class SQLGameDAO implements GameDAO {
 
-    private final Gson serializer = new Gson();
+    private final Gson serializer;
 
     public SQLGameDAO() throws DataAccessException {
         configureDatabase();
+        serializer = new GameGsonBuilder().createSerializer();
     }
 
     private final String[] createStatements = {
@@ -48,13 +53,15 @@ public class SQLGameDAO implements GameDAO {
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     if (param instanceof String p) {
                         ps.setString(i + 1, p);
                     } else if (param instanceof Integer p) {
                         ps.setInt(i + 1, p);
+                    } else if (param == null) {
+                        ps.setNull(i + 1, NULL);
                     }
                 }
                 ps.executeUpdate();
@@ -83,8 +90,8 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public int createGame(GameData gameData) throws DataAccessException {
         var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        return executeUpdate(statement, gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
-                gameData.gameName(), gameData.game());
+        return executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(),
+                gameData.gameName(), serializer.toJson(gameData.game()));
     }
 
     @Override

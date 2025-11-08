@@ -3,12 +3,12 @@ package service;
 import java.util.ArrayList;
 
 import dataaccess.DataAccessException;
+import dataaccess.SQLGameDAO;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ForbiddenResponse;
 
 import chess.ChessGame;
 import dataaccess.GameDAO;
-import dataaccess.MemoryGameDAO;
 import gamerequest.CreateGameRequest;
 import gamerequest.JoinGameRequest;
 import gameresult.ListGamesResult;
@@ -16,7 +16,11 @@ import model.GameData;
 
 public class GameService {
 
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final GameDAO gameDAO;
+
+    public GameService() throws DataAccessException{
+        gameDAO = new SQLGameDAO();
+    }
 
     public Integer createGame(CreateGameRequest request) throws DataAccessException {
         if (request.gameName() == null) {
