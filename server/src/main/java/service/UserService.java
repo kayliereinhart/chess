@@ -44,7 +44,7 @@ public class UserService {
         return authData;
     }
 
-    public AuthData login(UserData request) throws DataAccessException {
+    public AuthData login(UserData request) {
         try {
             UserData userData = userDAO.getUser(request.username());
 
