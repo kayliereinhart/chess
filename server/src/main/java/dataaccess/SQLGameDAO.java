@@ -103,27 +103,49 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData getGame(int gameID) {
-        return games.get(gameID);
+    public GameData getGame(Integer gameID) throws DataAccessException{
+        if (gameID == null) {
+            throw new DataAccessException("Unable to read game data: gameID == null");
+        } else {
+            try (Connection conn = DatabaseManager.getConnection()) {
+                var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
+                try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            return readGame(rs);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+            }
+            return null;
+        }
     }
 
     @Override
     public void addPlayer(String username, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
-        GameData currentGame = games.get(gameID);
-        GameData newGame;
+        try {
+            GameData currentGame = getGame(gameID);
+            String statement;
 
-        if (currentGame == null) {
-            throw new DataAccessException("game does not exist");
-        } else if (playerColor == ChessGame.TeamColor.WHITE) {
-            newGame = new GameData(gameID, username, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
-        } else {
-            newGame = new GameData(gameID, currentGame.whiteUsername(), username, currentGame.gameName(), currentGame.game());
+            if (currentGame == null) {
+                throw new DataAccessException("game does not exist");
+            } else if (playerColor == ChessGame.TeamColor.WHITE) {
+                statement = "UPDATE games SET whiteUsername=? WHERE gameID=?";
+            } else {
+                statement = "UPDATE games SET blackUsername=? WHERE gameID=?";
+            }
+            executeUpdate(statement, username, gameID);
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to add player: %s", e.getMessage()));
         }
-        games.put(gameID, newGame);
     }
 
     @Override
-    public void clearGames() {
-        games.clear();
+    public void clearGames() throws DataAccessException {
+        var statement = "TRUNCATE games";
+        executeUpdate(statement);
     }
 }
