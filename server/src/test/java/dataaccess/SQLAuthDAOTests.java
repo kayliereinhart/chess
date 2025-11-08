@@ -46,4 +46,15 @@ public class SQLAuthDAOTests {
     public void getAuthNoToken() {
         assertThrows(Exception.class, () -> dao.getAuth(null));
     }
+
+    @Test
+    public void positiveDeleteAuth() {
+        assertDoesNotThrow(() -> dao.createAuth(auth));
+        assertDoesNotThrow(() -> dao.deleteAuth(auth.authToken()));
+    }
+
+    @Test
+    public void deleteAuthNotInDB() {
+        assertThrows(Exception.class, () -> dao.deleteAuth(auth.authToken()));
+    }
 }
