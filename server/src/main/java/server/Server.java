@@ -67,7 +67,7 @@ public class Server {
         userHandler.handleLogout(authToken);
     }
 
-    private void createGame(Context ctx) {
+    private void createGame(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         userHandler.handleVerifyAuth(authToken);
 
@@ -76,7 +76,7 @@ public class Server {
         ctx.result(responseJson);
     }
 
-    private void listGames(Context ctx) {
+    private void listGames(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         userHandler.handleVerifyAuth(authToken);
 
@@ -84,7 +84,7 @@ public class Server {
         ctx.result(responseJson);
     }
 
-    private void joinGame(Context ctx) {
+    private void joinGame(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         String username = userHandler.handleVerifyAuth(authToken);
 

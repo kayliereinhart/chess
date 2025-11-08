@@ -88,15 +88,17 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        if (auths.containsKey(authToken)) {
-            auths.remove(authToken);
+        if (getAuth(authToken) != null) {
+            var statement = "DELETE FROM auths WHERE authToken=?";
+            executeUpdate(statement, authToken);
         } else {
             throw new DataAccessException("authToken does not exist");
         }
     }
 
     @Override
-    public void clearAuths() {
-        auths.clear();
+    public void clearAuths() throws DataAccessException {
+        var statement = "TRUNCATE auths";
+        executeUpdate(statement);
     }
 }

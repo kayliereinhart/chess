@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import model.UserData;
 
 public class SQLUserDAOTests {
+
     private static SQLUserDAO dao;
     private static UserData user;
 
@@ -20,7 +21,7 @@ public class SQLUserDAOTests {
     }
 
     @Test
-    public void positiveCreateUsers() {
+    public void positiveCreateUser() {
         assertDoesNotThrow(() -> dao.createUser(user));
     }
 

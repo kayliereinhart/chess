@@ -34,7 +34,7 @@ public class UserHandler {
         userService.logout(authToken);
     }
 
-    public String handleVerifyAuth(String authToken) {
+    public String handleVerifyAuth(String authToken) throws DataAccessException {
         return userService.verifyAuth(authToken);
     }
 
