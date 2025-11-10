@@ -16,6 +16,7 @@ public class SQLAuthDAOTests {
     }
 
     @AfterEach
+    @Test
     public void positiveClear() {
         assertDoesNotThrow(() -> dao.clearAuths());
     }

@@ -16,6 +16,7 @@ public class SQLUserDAOTests {
     }
 
     @AfterEach
+    @Test
     public void positiveClear() {
         assertDoesNotThrow(() -> dao.clearUsers());
     }
