@@ -62,7 +62,7 @@ public class Server {
         ctx.result(responseJson);
     }
 
-    private void logout(Context ctx) {
+    private void logout(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         userHandler.handleLogout(authToken);
     }

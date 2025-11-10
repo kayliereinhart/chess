@@ -13,12 +13,13 @@ import model.UserData;
 
 public class UserService {
 
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final AuthDAO authDAO;
     private final UserDAO userDAO;
     private final Encrypter encrypter = new Encrypter();
 
     public UserService() throws DataAccessException {
         userDAO = new SQLUserDAO();
+        authDAO = new SQLAuthDAO();
     }
 
     private String generateToken() {
@@ -26,31 +27,36 @@ public class UserService {
     }
 
     public AuthData register(UserData request) throws DataAccessException{
-        UserData existingUser = userDAO.getUser(request.username());
+        try {
+            UserData existingUser = userDAO.getUser(request.username());
 
-        if (existingUser != null) {
-            throw new ForbiddenResponse("already taken");
-        } else if (request.username() == null || request.password() == null || request.email() == null) {
-            throw new BadRequestResponse("bad request");
+            if (existingUser != null) {
+                throw new ForbiddenResponse("already taken");
+            } else if (request.username() == null || request.password() == null || request.email() == null) {
+                throw new BadRequestResponse("bad request");
+            }
+            String authToken = generateToken();
+            AuthData authData = new AuthData(authToken, request.username());
+
+            String hashedPassword = encrypter.encryptPassword(request.password());
+
+            userDAO.createUser(request.replacePassword(hashedPassword));
+            authDAO.createAuth(authData);
+
+            return authData;
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
         }
-        String authToken = generateToken();
-        AuthData authData = new AuthData(authToken, request.username());
-
-        String hashedPassword = encrypter.encryptPassword(request.password());
-
-        userDAO.createUser(request.replacePassword(hashedPassword));
-        authDAO.createAuth(authData);
-
-        return authData;
     }
 
-    public AuthData login(UserData request) {
+    public AuthData login(UserData request) throws DataAccessException {
         try {
+            if (request.username() == null || request.password() == null) {
+                throw new BadRequestResponse("bad request");
+            }
             UserData userData = userDAO.getUser(request.username());
 
-            if (request.password() == null) {
-                throw new BadRequestResponse("bad request");
-            } else if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
+            if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
                 throw new UnauthorizedResponse("unauthorized");
             }
             String authToken = generateToken();
@@ -60,15 +66,19 @@ public class UserService {
 
             return authData;
         } catch (DataAccessException e) {
-            throw new BadRequestResponse("bad request");
+            throw new DataAccessException(e.getMessage());
         }
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws DataAccessException {
         try {
-            authDAO.deleteAuth(authToken);
+            if (authDAO.getAuth(authToken) != null) {
+                authDAO.deleteAuth(authToken);
+            } else {
+                throw new UnauthorizedResponse("unauthorized");
+            }
         } catch (DataAccessException e) {
-            throw new UnauthorizedResponse("unauthorized");
+            throw new DataAccessException(e.getMessage());
         }
     }
 

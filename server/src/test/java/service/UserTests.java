@@ -51,6 +51,8 @@ public class UserTests {
 
         assertEquals(newUser.username(), authData.username());
         assertEquals(String.class, authData.authToken().getClass());
+
+        assertDoesNotThrow(() -> userService.verifyAuth(authData.authToken()));
     }
 
     @Test

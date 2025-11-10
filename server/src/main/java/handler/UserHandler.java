@@ -30,7 +30,7 @@ public class UserHandler {
         return serializer.toJson(result);
     }
 
-    public void handleLogout(String authToken) {
+    public void handleLogout(String authToken) throws DataAccessException {
         userService.logout(authToken);
     }
 
