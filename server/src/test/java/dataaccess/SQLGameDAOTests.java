@@ -16,7 +16,8 @@ public class SQLGameDAOTests {
     @BeforeAll
     public static void init() {
         dao = assertDoesNotThrow(SQLGameDAO::new);
-        gameData = new GameData(null, "white", "black", "GameName", new ChessGame());
+        gameData = new GameData(null, null, null, "GameName", new ChessGame());
+        assertDoesNotThrow(() -> dao.clearGames());
     }
 
     @AfterEach
@@ -44,6 +45,33 @@ public class SQLGameDAOTests {
 
         assertDoesNotThrow(() -> dao.createGame(gameData));
         Collection<GameData> listResult = assertDoesNotThrow(() -> dao.listGames());
-        assertEquals(games, listResult);
+        assertEquals(games, new ArrayList<>(listResult));
+    }
+
+    @Test
+    public void positiveGetGame() {
+        int id = assertDoesNotThrow(() -> dao.createGame(gameData));
+        GameData game = assertDoesNotThrow(() -> dao.getGame(id));
+        assertEquals(gameData.addID(1), game);
+    }
+
+    @Test
+    public void getGameNoID() {
+        assertDoesNotThrow(() -> dao.createGame(gameData));
+        assertThrows(Exception.class, () -> dao.getGame(null));
+    }
+
+    @Test
+    public void positiveAddPlayer() {
+        int id = assertDoesNotThrow(() -> dao.createGame(gameData));
+        assertDoesNotThrow(() -> dao.addPlayer("user", ChessGame.TeamColor.WHITE, 1));
+
+        GameData game = assertDoesNotThrow(() -> dao.getGame(1));
+        assertEquals("user", game.whiteUsername());
+    }
+
+    @Test
+    public void addPlayerGameNotExist() {
+        assertThrows(Exception.class, () -> dao.addPlayer("user", ChessGame.TeamColor.BLACK, 1));
     }
 }
