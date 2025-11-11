@@ -3,15 +3,13 @@ package gsonbuilder;
 import chess.*;
 import com.google.gson.*;
 
-import java.lang.reflect.Type;
-
 public class GameGsonBuilder {
 
     public Gson createSerializer() {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
         gsonBuilder.registerTypeAdapter(MovementRule.class, (JsonSerializer<MovementRule>)
-                (rule, type, ctx) -> {
+                (rule, _, ctx) -> {
             JsonElement json = ctx.serialize(rule);
             JsonObject object = json.getAsJsonObject();
 

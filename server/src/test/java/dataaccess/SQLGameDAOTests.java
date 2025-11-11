@@ -64,7 +64,7 @@ public class SQLGameDAOTests {
     @Test
     public void positiveAddPlayer() {
         int id = assertDoesNotThrow(() -> dao.createGame(gameData));
-        assertDoesNotThrow(() -> dao.addPlayer("user", ChessGame.TeamColor.WHITE, 1));
+        assertDoesNotThrow(() -> dao.addPlayer("user", ChessGame.TeamColor.WHITE, id));
 
         GameData game = assertDoesNotThrow(() -> dao.getGame(1));
         assertEquals("user", game.whiteUsername());
