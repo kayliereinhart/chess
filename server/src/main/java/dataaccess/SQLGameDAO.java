@@ -13,19 +13,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
-
-public class SQLGameDAO implements GameDAO {
+public class SQLGameDAO extends SQLDao implements GameDAO {
 
     private final Gson serializer;
 
     public SQLGameDAO() throws DataAccessException {
-        configureDatabase();
-        serializer = new GameGsonBuilder().createSerializer();
-    }
-
-    private final String[] createStatements = {
+        String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS games (
             gameID int NOT NULL AUTO_INCREMENT,
@@ -36,45 +29,9 @@ public class SQLGameDAO implements GameDAO {
             PRIMARY KEY (gameID)
             )
             """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
-        }
-    }
-
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
-                }
-                ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));
-        }
+        };
+        configureDatabase(createStatements);
+        serializer = new GameGsonBuilder().createSerializer();
     }
 
     private GameData readGame(ResultSet rs) throws SQLException {

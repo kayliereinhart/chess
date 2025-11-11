@@ -3,13 +3,10 @@ package dataaccess;
 import model.UserData;
 import java.sql.*;
 
-public class SQLUserDAO implements UserDAO {
+public class SQLUserDAO extends SQLDao implements UserDAO {
 
     public SQLUserDAO() throws DataAccessException {
-        configureDatabase();
-    }
-
-    private final String[] createStatements = {
+        String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS users (
             username varchar(256) NOT NULL,
@@ -18,35 +15,8 @@ public class SQLUserDAO implements UserDAO {
             PRIMARY KEY (username)
             )
             """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
-        }
-    }
-
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    }
-                }
-                ps.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));
-        }
+        };
+        configureDatabase(createStatements);
     }
 
     private UserData readUser(ResultSet rs) throws SQLException {
