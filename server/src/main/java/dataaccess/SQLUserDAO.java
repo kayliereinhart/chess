@@ -1,6 +1,8 @@
 package dataaccess;
 
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
+
 import java.sql.*;
 
 public class SQLUserDAO extends SQLDao implements UserDAO {
@@ -33,25 +35,29 @@ public class SQLUserDAO extends SQLDao implements UserDAO {
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
+    private UserData getFromDB(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readUser(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     @Override
     public UserData getUser(String username) throws DataAccessException {
         if (username == null) {
             throw new DataAccessException("Unable to read user data: username == null");
         } else {
-            try (Connection conn = DatabaseManager.getConnection()) {
-                var statement = "SELECT username, password, email FROM users WHERE username=?";
-                try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                    ps.setString(1, username);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            return readUser(rs);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-            }
-            return null;
+            return getFromDB(username);
         }
     }
 

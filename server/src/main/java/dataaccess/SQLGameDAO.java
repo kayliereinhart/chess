@@ -71,25 +71,29 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
         return result;
     }
 
+    private GameData getFromDB(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException{
         if (gameID == null) {
             throw new DataAccessException("Unable to read game data: gameID == null");
         } else {
-            try (Connection conn = DatabaseManager.getConnection()) {
-                var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games WHERE gameID=?";
-                try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                    ps.setInt(1, gameID);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            return readGame(rs);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
-            }
-            return null;
+            return getFromDB(gameID);
         }
     }
 
