@@ -10,31 +10,29 @@ public class GameGsonBuilder {
     public Gson createSerializer() {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
-        gsonBuilder.registerTypeAdapter(MovementRule.class, new JsonSerializer<MovementRule>() {
-            @Override
-            public JsonElement serialize(MovementRule rule, Type type, JsonSerializationContext ctx) {
-                JsonElement json = ctx.serialize(rule);
-                JsonObject object = json.getAsJsonObject();
+        gsonBuilder.registerTypeAdapter(MovementRule.class, (JsonSerializer<MovementRule>)
+                (rule, type, ctx) -> {
+            JsonElement json = ctx.serialize(rule);
+            JsonObject object = json.getAsJsonObject();
 
-                if (rule instanceof PawnMovementRule) {
-                    object.addProperty("type", "PawnMovementRule");
-                } else if (rule instanceof RookMovementRule) {
-                    object.addProperty("type", "RookMovementRule");
-                } else if (rule instanceof BishopMovementRule) {
-                    object.addProperty("type", "BishopMovementRule");
-                } else if (rule instanceof KnightMovementRule) {
-                    object.addProperty("type", "KnightMovementRule");
-                } else if (rule instanceof QueenMovementRule) {
-                    object.addProperty("type", "QueenMovementRule");
-                } else if (rule instanceof KingMovementRule) {
-                    object.addProperty("type", "KingMovementRule");
-                }
-                return object;
+            if (rule instanceof PawnMovementRule) {
+                object.addProperty("type", "PawnMovementRule");
+            } else if (rule instanceof RookMovementRule) {
+                object.addProperty("type", "RookMovementRule");
+            } else if (rule instanceof BishopMovementRule) {
+                object.addProperty("type", "BishopMovementRule");
+            } else if (rule instanceof KnightMovementRule) {
+                object.addProperty("type", "KnightMovementRule");
+            } else if (rule instanceof QueenMovementRule) {
+                object.addProperty("type", "QueenMovementRule");
+            } else if (rule instanceof KingMovementRule) {
+                object.addProperty("type", "KingMovementRule");
             }
+            return object;
         });
 
         gsonBuilder.registerTypeAdapter(MovementRule.class,
-                (JsonDeserializer<MovementRule>) (el, type, ctx) -> {
+                (JsonDeserializer<MovementRule>) (el, _, ctx) -> {
             if (!el.isJsonObject()) {
                 return null;
             }

@@ -1,8 +1,6 @@
 package dataaccess;
 
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
-
 import java.sql.*;
 
 public class SQLUserDAO extends SQLDao implements UserDAO {
