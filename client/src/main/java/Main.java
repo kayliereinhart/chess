@@ -1,4 +1,5 @@
 import chess.*;
+import client.Client;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,12 +8,12 @@ public class Main {
 //            serverUrl = args[0];
 //        }
 
-        try {
-            new Client(serverUrl).run();
-
-        } catch (Throwable ex) {
-            System.out.printf("Unable to start server: %s%n", ex.getMessage());
-        }
+//        try {
+//            new Client(serverUrl).run();
+//
+//        } catch (Throwable ex) {
+//            System.out.printf("Unable to start server: %s%n", ex.getMessage());
+//        }
         //System.out.println("♕ 240 Chess Client: ");
     }
 }
