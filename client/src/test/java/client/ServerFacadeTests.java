@@ -6,6 +6,8 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import java.net.HttpURLConnection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -60,6 +62,19 @@ public class ServerFacadeTests {
         facade.register(user);
         assertThrows(Exception.class, () -> facade.login(new UserData("player1", "wrong",
                 "p1@email.com")));
+    }
+
+    @Test
+    public void positiveLogout() throws Exception {
+        var authData = facade.register(user);
+        assertDoesNotThrow(() -> facade.logout(authData.authToken()));
+    }
+
+    @Test
+    public void logoutNotLoggedIn() throws Exception {
+        var authData = facade.register(user);
+        assertDoesNotThrow(() -> facade.logout(authData.authToken()));
+        assertThrows(Exception.class, () -> facade.logout(authData.authToken()));
     }
 
 }
