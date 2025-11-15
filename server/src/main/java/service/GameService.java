@@ -9,9 +9,9 @@ import io.javalin.http.ForbiddenResponse;
 
 import chess.ChessGame;
 import dataaccess.GameDAO;
-import gamerequest.CreateGameRequest;
-import gamerequest.JoinGameRequest;
-import gameresult.ListGamesResult;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
+import model.ListGamesResult;
 import model.GameData;
 
 public class GameService {

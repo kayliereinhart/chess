@@ -8,9 +8,9 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import chess.ChessGame;
-import gamerequest.CreateGameRequest;
-import gamerequest.JoinGameRequest;
-import gameresult.ListGamesResult;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
+import model.ListGamesResult;
 import model.GameData;
 
 public class GameTests {

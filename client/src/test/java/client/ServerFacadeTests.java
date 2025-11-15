@@ -1,12 +1,12 @@
 package client;
 
 import model.AuthData;
+import model.CreateGameRequest;
+import model.CreateGameResult;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
-
-import java.net.HttpURLConnection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,6 +75,27 @@ public class ServerFacadeTests {
         var authData = facade.register(user);
         assertDoesNotThrow(() -> facade.logout(authData.authToken()));
         assertThrows(Exception.class, () -> facade.logout(authData.authToken()));
+    }
+
+    @Test
+    public void positiveCreateGame() throws Exception {
+        var authData = facade.register(user);
+        CreateGameRequest request = new CreateGameRequest("GameName");
+        CreateGameResult result = assertDoesNotThrow(() -> facade.createGame(request, authData.authToken()));
+        assertTrue(result.gameID() >= 0);
+    }
+
+    @Test
+    public void createGameNoName() throws Exception {
+        var authData = facade.register(user);
+        CreateGameRequest request = new CreateGameRequest(null);
+        assertThrows(Exception.class, () -> facade.createGame(request, authData.authToken()));
+    }
+
+    @Test
+    public void createGameNoAuth() throws Exception {
+        CreateGameRequest request = new CreateGameRequest("GameName");
+        assertThrows(Exception.class, () -> facade.createGame(request, null));
     }
 
 }

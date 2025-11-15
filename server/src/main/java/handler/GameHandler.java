@@ -5,8 +5,8 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 import dataaccess.DataAccessException;
-import gamerequest.CreateGameRequest;
-import gamerequest.JoinGameRequest;
+import model.CreateGameRequest;
+import model.JoinGameRequest;
 import service.GameService;
 
 public class GameHandler {

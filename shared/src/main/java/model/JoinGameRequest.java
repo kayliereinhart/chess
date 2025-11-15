@@ -1,4 +1,4 @@
-package gamerequest;
+package model;
 
 import chess.ChessGame;
 
