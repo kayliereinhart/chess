@@ -32,7 +32,7 @@ public class GameTests {
         CreateGameRequest request = new CreateGameRequest("newGame");
         int gameID = assertDoesNotThrow(() -> gameService.createGame(request));
 
-        GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
+        GameData gameData = new GameData(gameID, null, null, "newGame", null);
         ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
@@ -77,7 +77,7 @@ public class GameTests {
         CreateGameRequest request = new CreateGameRequest("newGame");
         int gameID = assertDoesNotThrow(() -> gameService.createGame(request));
 
-        GameData gameData = new GameData(gameID, null, null, "newGame", new ChessGame());
+        GameData gameData = new GameData(gameID, null, null, "newGame", null);
         ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 

@@ -39,9 +39,9 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
         var whiteUsername = rs.getString("whiteUsername");
         var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
-        var game = serializer.fromJson(rs.getString("game"), ChessGame.class);
+        // var game = serializer.fromJson(rs.getString("game"), ChessGame.class);
 
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, null);
     }
 
     @Override
@@ -56,7 +56,8 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
         var result = new ArrayList<GameData>();
 
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+//            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName FROM games";
 
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (ResultSet rs = ps.executeQuery()) {

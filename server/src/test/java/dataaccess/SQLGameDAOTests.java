@@ -16,7 +16,7 @@ public class SQLGameDAOTests {
     @BeforeAll
     public static void init() {
         dao = assertDoesNotThrow(SQLGameDAO::new);
-        gameData = new GameData(null, null, null, "GameName", new ChessGame());
+        gameData = new GameData(null, null, null, "GameName", null);
         assertDoesNotThrow(() -> dao.clearGames());
     }
 

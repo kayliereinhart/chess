@@ -1,6 +1,5 @@
 package client;
 
-import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -105,12 +104,17 @@ public class ServerFacadeTests {
         CreateGameResult createResult = assertDoesNotThrow(() -> facade.createGame(request, authData.authToken()));
 
         GameData gameData = new GameData(createResult.gameID(), null, null,
-                "GameName", new ChessGame());
+                "GameName", null);
         ArrayList<GameData> games = new ArrayList<>();
         games.add(gameData);
 
         ListGamesResult listResult = assertDoesNotThrow(() -> facade.listGames(authData.authToken()));
         assertEquals(new ListGamesResult(games), listResult);
+    }
+
+    @Test
+    public void listGamesNotAuthorized() throws Exception {
+        assertThrows(Exception.class, () -> facade.listGames("adkf"));
     }
 
 }

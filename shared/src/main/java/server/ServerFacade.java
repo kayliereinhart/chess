@@ -17,7 +17,8 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
-        serializer = new GameGsonBuilder().createSerializer();
+        // serializer = new GameGsonBuilder().createSerializer();
+        serializer = new Gson();
     }
 
     public void clear() throws Exception {
