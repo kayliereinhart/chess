@@ -1,12 +1,12 @@
 package client;
 
-import model.AuthData;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import model.UserData;
+import chess.ChessGame;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -96,6 +96,21 @@ public class ServerFacadeTests {
     public void createGameNoAuth() throws Exception {
         CreateGameRequest request = new CreateGameRequest("GameName");
         assertThrows(Exception.class, () -> facade.createGame(request, null));
+    }
+
+    @Test
+    public void positiveListGames() throws Exception {
+        var authData = facade.register(user);
+        CreateGameRequest request = new CreateGameRequest("GameName");
+        CreateGameResult createResult = assertDoesNotThrow(() -> facade.createGame(request, authData.authToken()));
+
+        GameData gameData = new GameData(createResult.gameID(), null, null,
+                "GameName", new ChessGame());
+        ArrayList<GameData> games = new ArrayList<>();
+        games.add(gameData);
+
+        ListGamesResult listResult = assertDoesNotThrow(() -> facade.listGames(authData.authToken()));
+        assertEquals(new ListGamesResult(games), listResult);
     }
 
 }

@@ -1,10 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.CreateGameRequest;
-import model.CreateGameResult;
-import model.UserData;
+import gsonbuilder.GameGsonBuilder;
+import model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,9 +13,11 @@ public class ServerFacade {
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private final Gson serializer;
 
     public ServerFacade(String url) {
         serverUrl = url;
+        serializer = new GameGsonBuilder().createSerializer();
     }
 
     public void clear() throws Exception {
@@ -49,6 +49,12 @@ public class ServerFacade {
         return handleResponse(response, CreateGameResult.class);
     }
 
+    public ListGamesResult listGames(String authToken) throws Exception {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String header) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
@@ -64,7 +70,7 @@ public class ServerFacade {
 
     private HttpRequest.BodyPublisher makeRequestBody(Object request) {
         if (request != null) {
-            return HttpRequest.BodyPublishers.ofString(new Gson().toJson(request));
+            return HttpRequest.BodyPublishers.ofString(serializer.toJson(request));
         } else {
             return HttpRequest.BodyPublishers.noBody();
         }
@@ -90,7 +96,7 @@ public class ServerFacade {
         }
 
         if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
+            return serializer.fromJson(response.body(), responseClass);
         }
 
         return null;
