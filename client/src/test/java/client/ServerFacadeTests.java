@@ -39,4 +39,11 @@ public class ServerFacadeTests {
         assertTrue(authData.authToken().length() > 10);
     }
 
+    @Test
+    public void registerSameUserTwice() throws Exception {
+        UserData user = new UserData("player1", "password", "p1@email.com");
+        assertDoesNotThrow(() -> facade.register(user));
+        assertThrows(Exception.class, () -> facade.register(user));
+    }
+
 }
