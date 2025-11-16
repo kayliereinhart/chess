@@ -1,9 +1,14 @@
 package client;
 
+import model.CreateGameRequest;
+import model.GameData;
+import model.ListGamesResult;
 import model.UserData;
 import server.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Client {
@@ -49,8 +54,8 @@ public class Client {
                 case "help" -> help();
                 case "register" -> register(params);
                 case "login" -> login(params);
-                case "create" -> "create result";
-                case "list" -> "list result";
+                case "create" -> createGame(params);
+                case "list" -> listGames();
                 case "join" -> "join result";
                 case "observe" -> "observe result";
                 case "logout" -> logout();
@@ -69,7 +74,7 @@ public class Client {
                     "   quit - playing chess\n" +
                     "   help - with possible commands";
         }
-        return "   createGame <NAME> - a game\n" +
+        return "   create <NAME> - a game\n" +
                 "   list - games\n" +
                 "   join <ID> [WHITE|BLACK] - a game\n" +
                 "   observe <ID> - a game\n" +
@@ -102,8 +107,37 @@ public class Client {
         throw new Exception("Expected: <USERNAME> <PASSWORD>");
     }
 
+    private String createGame(String... params) throws Exception {
+        assertLoggedIn();
+
+        if (params.length == 1) {
+            CreateGameRequest request = new CreateGameRequest(params[0]);
+            server.createGame(request, authToken);
+
+            return username + " created game " + params[0];
+        }
+        throw new Exception("Expected: <NAME>");
+    }
+
+    private String listGames() throws Exception {
+        assertLoggedIn();
+
+        ArrayList<GameData> games = new ArrayList<>(server.listGames(authToken).games());
+        StringBuilder strBuilder = new StringBuilder();
+
+        for (int i = 1; i < games.size(); i++) {
+            GameData game = games.get(i);
+            String whiteUser = game.whiteUsername() == null ? "None" : game.whiteUsername();
+            strBuilder.append(i + ": " + game.gameName() + "\n");
+            strBuilder.append("    White Player: " + game.whiteUsername() + "\n");
+            strBuilder.append("    Black Player: " + game.blackUsername() + "\n");
+        }
+        return strBuilder.toString();
+    }
+
     private String logout() throws Exception {
         assertLoggedIn();
+
         String name = username;
         server.logout(authToken);
         state = State.LOGGEDOUT;
