@@ -9,6 +9,8 @@ import server.ServerFacade;
 
 import java.util.*;
 
+import ui.EscapeSequences;
+
 public class Client {
 
     private final ServerFacade server;
@@ -204,6 +206,7 @@ public class Client {
         StringBuilder strBuilder = new StringBuilder();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
+        int light = 1;
 
         strBuilder.append("   a  b  c  d  e  f  g  h\n");
 
@@ -213,9 +216,24 @@ public class Client {
             for (int j = 1; j < 9; j++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
 
+                switch (light) {
+                    case 0:
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                        light = 1;
+                        break;
+                    case 1:
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_RED);
+                        light = 0;
+                        break;
+                }
+
                 if (piece == null) {
                     strBuilder.append("   ");
                 } else {
+                    switch (piece.getTeamColor()) {
+                        case WHITE -> strBuilder.append(EscapeSequences.SET_TEXT_COLOR_WHITE);
+                        case BLACK -> strBuilder.append(EscapeSequences.SET_TEXT_COLOR_GREEN);
+                    }
                     switch (piece.getPieceType()) {
                         case ROOK -> strBuilder.append(" R ");
                         case KNIGHT -> strBuilder.append(" N ");
@@ -225,6 +243,12 @@ public class Client {
                         case PAWN -> strBuilder.append(" P ");
                     }
                 }
+                strBuilder.append(EscapeSequences.RESET_TEXT_COLOR);
+                strBuilder.append(EscapeSequences.RESET_BG_COLOR);
+            }
+            switch (light) {
+                case 0 -> light = 1;
+                case 1 -> light = 0;
             }
             strBuilder.append(" " + (9 - i) + "\n");
         }
