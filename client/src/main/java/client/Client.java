@@ -11,6 +11,7 @@ public class Client {
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
     private String username = null;
+    private String authToken = null;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -48,8 +49,13 @@ public class Client {
                 case "help" -> help();
                 case "register" -> register(params);
                 case "login" -> login(params);
+                case "create" -> "create result";
+                case "list" -> "list result";
+                case "join" -> "join result";
+                case "observe" -> "observe result";
+                case "logout" -> logout();
                 case "quit" -> "quit";
-                default -> "not recognized";
+                default -> "command not recognized\nvalid commands:\n" + help();
             };
         } catch (Exception e) {
             return e.getMessage();
@@ -63,15 +69,23 @@ public class Client {
                     "   quit - playing chess\n" +
                     "   help - with possible commands";
         }
-        return "    loggedin";
+        return "   createGame <NAME> - a game\n" +
+                "   list - games\n" +
+                "   join <ID> [WHITE|BLACK] - a game\n" +
+                "   observe <ID> - a game\n" +
+                "   logout - when you are done\n" +
+                "   quit - playing chess\n" +
+                "   help - with possible commands";
     }
 
     private String register(String... params) throws Exception {
         if (params.length == 3) {
             UserData user = new UserData(params[0], params[1], params[2]);
-            server.register(user);
+            authToken = server.register(user).authToken();
+            username = params[0];
             state = State.LOGGEDIN;
-            return "You registered as " + params[0];
+
+            return "You registered as " + username;
         }
         throw new Exception("Expected: <USERNAME> <PASSWORD> <EMAIL>");
     }
@@ -79,10 +93,29 @@ public class Client {
     private String login(String... params) throws Exception {
         if (params.length == 2) {
             UserData user = new UserData(params[0], params[1], null);
-            server.login(user);
+            authToken = server.login(user).authToken();
+            username = params[0];
             state = State.LOGGEDIN;
-            return "You logged in as " + params[0];
+
+            return "You logged in as " + username;
         }
         throw new Exception("Expected: <USERNAME> <PASSWORD>");
+    }
+
+    private String logout() throws Exception {
+        assertLoggedIn();
+        String name = username;
+        server.logout(authToken);
+        state = State.LOGGEDOUT;
+        authToken = null;
+        username = null;
+
+        return name + " logged out";
+    }
+
+    private void assertLoggedIn() throws Exception {
+        if (state == State.LOGGEDOUT) {
+            throw new Exception("You must log in");
+        }
     }
 }
