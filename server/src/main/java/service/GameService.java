@@ -39,16 +39,16 @@ public class GameService {
 
         if (gameData == null || (request.playerColor() != ChessGame.TeamColor.BLACK &&
                 request.playerColor() != ChessGame.TeamColor.WHITE)) {
-            throw new BadRequestResponse("bad request");
+            throw new BadRequestResponse("invalid game ID");
         } else if ((request.playerColor() == ChessGame.TeamColor.BLACK && gameData.blackUsername() != null) ||
                 (request.playerColor() == ChessGame.TeamColor.WHITE && gameData.whiteUsername() != null)) {
-            throw new ForbiddenResponse("already taken");
+            throw new ForbiddenResponse("player color already taken");
         }
 
         try {
             gameDAO.addPlayer(request.username(), request.playerColor(), request.gameID());
         } catch (DataAccessException e) {
-            throw new BadRequestResponse("bad request");
+            throw new BadRequestResponse("invalid username, player color, or game ID");
         }
     }
 

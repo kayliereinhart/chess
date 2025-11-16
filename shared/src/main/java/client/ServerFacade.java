@@ -94,7 +94,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw new Exception(body);
+                throw new Exception(serializer.fromJson(body, Response.class).message());
             }
 
             throw new Exception("other failure: " + status);

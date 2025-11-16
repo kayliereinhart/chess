@@ -31,7 +31,7 @@ public class UserService {
             UserData existingUser = userDAO.getUser(request.username());
 
             if (existingUser != null) {
-                throw new ForbiddenResponse("already taken");
+                throw new ForbiddenResponse("username already taken");
             } else if (request.username() == null || request.password() == null || request.email() == null) {
                 throw new BadRequestResponse("bad request");
             }
@@ -57,7 +57,7 @@ public class UserService {
             UserData userData = userDAO.getUser(request.username());
 
             if (userData == null || !encrypter.checkPassword(request.password(), userData.password())) {
-                throw new UnauthorizedResponse("unauthorized");
+                throw new UnauthorizedResponse("invalid username or password");
             }
             String authToken = generateToken();
             AuthData authData = new AuthData(authToken, request.username());
