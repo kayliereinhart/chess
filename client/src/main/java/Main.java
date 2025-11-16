@@ -8,12 +8,10 @@ public class Main {
 //            serverUrl = args[0];
 //        }
 
-//        try {
-//            new Client(serverUrl).run();
-//
-//        } catch (Throwable ex) {
-//            System.out.printf("Unable to start server: %s%n", ex.getMessage());
-//        }
-        //System.out.println("♕ 240 Chess Client: ");
+        try {
+            new Client(serverUrl).run();
+        } catch (Throwable e) {
+            System.out.printf("Unable to start server: %s%n", e.getMessage());
+        }
     }
 }

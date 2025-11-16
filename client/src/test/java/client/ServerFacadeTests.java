@@ -45,7 +45,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void registerSameUserTwice() throws Exception {
+    public void registerSameUserTwice() {
         assertDoesNotThrow(() -> facade.register(user));
         assertThrows(Exception.class, () -> facade.register(user));
     }
@@ -93,7 +93,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGameNoAuth() throws Exception {
+    public void createGameNoAuth() {
         CreateGameRequest request = new CreateGameRequest("GameName");
         assertThrows(Exception.class, () -> facade.createGame(request, null));
     }
@@ -114,7 +114,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesNotAuthorized() throws Exception {
+    public void listGamesNotAuthorized() {
         assertThrows(Exception.class, () -> facade.listGames("adkf"));
     }
 
