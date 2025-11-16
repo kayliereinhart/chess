@@ -161,6 +161,10 @@ public class Client {
                 throw new Exception("Error: ID should be an integer");
             }
 
+            if ( id > gameMap.size()) {
+                throw new Exception("Error: No game with ID");
+            }
+
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
 
@@ -173,11 +177,21 @@ public class Client {
         assertLoggedIn();
 
         if (params.length == 1) {
+            int id = 1;
             try {
-                int id = Integer.parseInt(params[0]);
+                try {
+                    id = Integer.parseInt(params[0]);
+                } catch (Exception e) {
+                    throw new Exception("Error: ID should be an integer");
+                }
+
+                if (id > gameMap.size()) {
+                    throw new Exception("Error: No game with ID");
+                }
+
                 return printBoard(ChessGame.TeamColor.WHITE);
             } catch (Exception e) {
-                throw new Exception("Error: ID should be an integer");
+                throw new Exception(e.getMessage());
             }
         }
         throw new Exception("Expected: <ID>");
