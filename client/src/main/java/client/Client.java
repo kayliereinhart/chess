@@ -175,7 +175,7 @@ public class Client {
         if (params.length == 1) {
             try {
                 int id = Integer.parseInt(params[0]);
-                return "observe game" + id;
+                return printBoard(ChessGame.TeamColor.WHITE);
             } catch (Exception e) {
                 throw new Exception("Error: ID should be an integer");
             }
