@@ -77,6 +77,35 @@ public class ChessBoard implements Cloneable {
         }
     }
 
+    private int switchNumbers(int num) {
+        return switch (num) {
+            case 0 -> 8;
+            case 1 -> 7;
+            case 2 -> 6;
+            case 3 -> 5;
+            case 4 -> 4;
+            case 5 -> 3;
+            case 6 -> 2;
+            case 7 -> 1;
+            default -> 0;
+        };
+    }
+
+    public ChessBoard flipBoard() {
+        ChessBoard flipped = new ChessBoard();
+
+        for (int i = 0; i < 8; i++) {
+            int row = switchNumbers(i);
+
+            for (int j = 0; j < 8; j++) {
+                int col = switchNumbers(j);
+                ChessPiece piece = getPiece(new ChessPosition(i + 1, j + 1));
+                flipped.addPiece(new ChessPosition(row, col), piece);
+            }
+        }
+        return flipped;
+    }
+
     private boolean isKingPosition(ChessPosition position, ChessGame.TeamColor team) {
         ChessPiece piece = getPiece(position);
 

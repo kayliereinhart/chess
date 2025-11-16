@@ -165,7 +165,7 @@ public class Client {
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
 
-            return printBoard();
+            return printBoard(color);
         }
         throw new Exception("Expected: <ID> [WHITE|BLACK]");
     }
@@ -202,16 +202,26 @@ public class Client {
         }
     }
 
-    private String printBoard() {
+    private String printBoard(ChessGame.TeamColor color) {
         StringBuilder strBuilder = new StringBuilder();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
         int light = 1;
 
-        strBuilder.append("   a  b  c  d  e  f  g  h\n");
+        if (color == ChessGame.TeamColor.WHITE) {
+            board = board.flipBoard();
+        }
+
+        switch (color) {
+            case WHITE -> strBuilder.append("   a  b  c  d  e  f  g  h\n");
+            case BLACK -> strBuilder.append("   h  g  f  e  d  c  b  a\n");
+        }
 
         for (int i = 1; i < 9; i++) {
-            strBuilder.append(9 - i + " ");
+            switch (color) {
+                case WHITE -> strBuilder.append(9 - i + " ");
+                case BLACK -> strBuilder.append(i + " ");
+            }
 
             for (int j = 1; j < 9; j++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
@@ -250,9 +260,15 @@ public class Client {
                 case 0 -> light = 1;
                 case 1 -> light = 0;
             }
-            strBuilder.append(" " + (9 - i) + "\n");
+            switch (color) {
+                case WHITE -> strBuilder.append(" " + (9 - i) + "\n");
+                case BLACK -> strBuilder.append(" " + i + "\n");
+            }
         }
-        strBuilder.append("   a  b  c  d  e  f  g  h\n");
+        switch (color) {
+            case WHITE -> strBuilder.append("   a  b  c  d  e  f  g  h\n");
+            case BLACK -> strBuilder.append("   h  g  f  e  d  c  b  a\n");
+        }
         return strBuilder.toString();
     }
 }
