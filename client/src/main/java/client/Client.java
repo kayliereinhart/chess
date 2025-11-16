@@ -10,7 +10,7 @@ public class Client {
 
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
-    private ArrayList<GameData> gameList = null;
+    private HashMap<Integer, Integer> gameMap = null;
     private String username = null;
     private String authToken = null;
 
@@ -118,11 +118,14 @@ public class Client {
     private String listGames() throws Exception {
         assertLoggedIn();
 
-        gameList = new ArrayList<>(server.listGames(authToken).games());
+        ArrayList<GameData> games  = new ArrayList<>(server.listGames(authToken).games());
+        gameMap = new HashMap<>();
         StringBuilder strBuilder = new StringBuilder();
 
-        for (int i = 0; i < gameList.size(); i++) {
-            GameData game = gameList.get(i);
+        for (int i = 0; i < games.size(); i++) {
+            GameData game = games.get(i);
+            gameMap.put(i + 1, game.gameID());
+
             String whiteUser = game.whiteUsername() == null ? "None" : game.whiteUsername();
             String blackUser = game.blackUsername() == null ? "None" : game.blackUsername();
 
@@ -138,7 +141,7 @@ public class Client {
 
         if (params.length == 2) {
             ChessGame.TeamColor color;
-            Integer id;
+            int id;
 
             if (Objects.equals(params[1], "white")) {
                 color = ChessGame.TeamColor.WHITE;
@@ -154,7 +157,7 @@ public class Client {
                 throw new Exception("Error: ID should be an integer");
             }
 
-            JoinGameRequest request = new JoinGameRequest(username, color, id);
+            JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
 
             return username + " joined game " + id + " as " + params[1];
@@ -167,7 +170,7 @@ public class Client {
 
         if (params.length == 1) {
             try {
-                Integer id = Integer.parseInt(params[0]);
+                int id = Integer.parseInt(params[0]);
                 return "observe game" + id;
             } catch (Exception e) {
                 throw new Exception("Error: ID should be an integer");
