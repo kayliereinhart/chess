@@ -1,5 +1,6 @@
 package client;
 
+import model.UserData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ public class Client {
 
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
+    private String username = null;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -44,8 +46,8 @@ public class Client {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "help" -> help();
-                case "register" -> "register result";
-                case "login" -> "login result";
+                case "register" -> register(params);
+                case "login" -> login(params);
                 case "quit" -> "quit";
                 default -> "not recognized";
             };
@@ -56,11 +58,31 @@ public class Client {
 
     private String help() {
         if (state == State.LOGGEDOUT) {
-            return "   register <USERNAME> <PASSWORD> <EMAIL> - to create an account\n" +
+            return "   register <USERNAME> <PASSWORD> <EMAIL>" + " - to create an account\n" +
                     "   login <USERNAME> <PASSWORD> - to play chess\n" +
                     "   quit - playing chess\n" +
                     "   help - with possible commands";
         }
         return "    loggedin";
+    }
+
+    private String register(String... params) throws Exception {
+        if (params.length == 3) {
+            UserData user = new UserData(params[0], params[1], params[2]);
+            server.register(user);
+            state = State.LOGGEDIN;
+            return "You registered as " + params[0];
+        }
+        throw new Exception("Expected: <USERNAME> <PASSWORD> <EMAIL>");
+    }
+
+    private String login(String... params) throws Exception {
+        if (params.length == 2) {
+            UserData user = new UserData(params[0], params[1], null);
+            server.login(user);
+            state = State.LOGGEDIN;
+            return "You logged in as " + params[0];
+        }
+        throw new Exception("Expected: <USERNAME> <PASSWORD>");
     }
 }
