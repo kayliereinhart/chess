@@ -10,6 +10,7 @@ public class Client {
 
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
+    private ArrayList<GameData> gameList = null;
     private String username = null;
     private String authToken = null;
 
@@ -52,7 +53,7 @@ public class Client {
                 case "create" -> createGame(params);
                 case "list" -> listGames();
                 case "join" -> joinGame(params);
-                case "observe" -> "observe result";
+                case "observe" -> observe(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> "command not recognized\nvalid commands:\n" + help();
@@ -117,11 +118,11 @@ public class Client {
     private String listGames() throws Exception {
         assertLoggedIn();
 
-        ArrayList<GameData> games = new ArrayList<>(server.listGames(authToken).games());
+        gameList = new ArrayList<>(server.listGames(authToken).games());
         StringBuilder strBuilder = new StringBuilder();
 
-        for (int i = 0; i < games.size(); i++) {
-            GameData game = games.get(i);
+        for (int i = 0; i < gameList.size(); i++) {
+            GameData game = gameList.get(i);
             String whiteUser = game.whiteUsername() == null ? "None" : game.whiteUsername();
             String blackUser = game.blackUsername() == null ? "None" : game.blackUsername();
 
@@ -137,6 +138,7 @@ public class Client {
 
         if (params.length == 2) {
             ChessGame.TeamColor color;
+            Integer id;
 
             if (Objects.equals(params[1], "white")) {
                 color = ChessGame.TeamColor.WHITE;
@@ -146,12 +148,32 @@ public class Client {
                 throw new Exception("Expected: <ID> [WHITE|BLACK]");
             }
 
-            JoinGameRequest request = new JoinGameRequest(username, color, Integer.parseInt(params[0]));
+            try {
+                id = Integer.parseInt(params[0]);
+            } catch (Exception e) {
+                throw new Exception("Error: ID should be an integer");
+            }
+
+            JoinGameRequest request = new JoinGameRequest(username, color, id);
             server.joinGame(request, authToken);
 
-            return username + " joined game " + params[0] + " as " + params[1];
+            return username + " joined game " + id + " as " + params[1];
         }
         throw new Exception("Expected: <ID> [WHITE|BLACK]");
+    }
+
+    private String observe(String... params) throws Exception {
+        assertLoggedIn();
+
+        if (params.length == 1) {
+            try {
+                Integer id = Integer.parseInt(params[0]);
+                return "observe game" + id;
+            } catch (Exception e) {
+                throw new Exception("Error: ID should be an integer");
+            }
+        }
+        throw new Exception("Expected: <ID>");
     }
 
     private String logout() throws Exception {
