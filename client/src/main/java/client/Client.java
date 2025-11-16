@@ -5,7 +5,6 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.*;
-import server.ServerFacade;
 
 import java.util.*;
 
