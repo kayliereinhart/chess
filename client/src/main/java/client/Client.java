@@ -1,6 +1,9 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.*;
 import server.ServerFacade;
 
@@ -160,7 +163,7 @@ public class Client {
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
 
-            return username + " joined game " + id + " as " + params[1];
+            return printBoard();
         }
         throw new Exception("Expected: <ID> [WHITE|BLACK]");
     }
@@ -195,5 +198,37 @@ public class Client {
         if (state == State.LOGGEDOUT) {
             throw new Exception("You must log in");
         }
+    }
+
+    private String printBoard() {
+        StringBuilder strBuilder = new StringBuilder();
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+
+        strBuilder.append("   a  b  c  d  e  f  g  h\n");
+
+        for (int i = 1; i < 9; i++) {
+            strBuilder.append(9 - i + " ");
+
+            for (int j = 1; j < 9; j++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+
+                if (piece == null) {
+                    strBuilder.append("   ");
+                } else {
+                    switch (piece.getPieceType()) {
+                        case ROOK -> strBuilder.append(" R ");
+                        case KNIGHT -> strBuilder.append(" N ");
+                        case BISHOP -> strBuilder.append(" B ");
+                        case QUEEN -> strBuilder.append(" Q ");
+                        case KING -> strBuilder.append(" K ");
+                        case PAWN -> strBuilder.append(" P ");
+                    }
+                }
+            }
+            strBuilder.append(" " + (9 - i) + "\n");
+        }
+        strBuilder.append("   a  b  c  d  e  f  g  h\n");
+        return strBuilder.toString();
     }
 }
