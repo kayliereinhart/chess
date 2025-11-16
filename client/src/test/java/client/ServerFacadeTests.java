@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -115,6 +116,32 @@ public class ServerFacadeTests {
     @Test
     public void listGamesNotAuthorized() throws Exception {
         assertThrows(Exception.class, () -> facade.listGames("adkf"));
+    }
+
+    @Test
+    public void positiveJoinGame() throws Exception {
+        var authData = facade.register(user);
+        CreateGameRequest createRequest = new CreateGameRequest("GameName");
+        CreateGameResult createResult = assertDoesNotThrow(() -> facade.createGame(createRequest, authData.authToken()));
+
+        JoinGameRequest joinRequest = new JoinGameRequest(user.username(), ChessGame.TeamColor.WHITE,
+                createResult.gameID());
+        assertDoesNotThrow(() -> facade.joinGame(joinRequest, authData.authToken()));
+
+        ArrayList<GameData> games = new ArrayList<>(facade.listGames(authData.authToken()).games());
+        assertEquals(user.username(), games.getFirst().whiteUsername());
+    }
+
+    @Test
+    public void joinGameColorTaken() throws Exception {
+        var authData = facade.register(user);
+        CreateGameRequest createRequest = new CreateGameRequest("GameName");
+        CreateGameResult createResult = assertDoesNotThrow(() -> facade.createGame(createRequest, authData.authToken()));
+
+        JoinGameRequest joinRequest = new JoinGameRequest(user.username(), ChessGame.TeamColor.WHITE,
+                createResult.gameID());
+        assertDoesNotThrow(() -> facade.joinGame(joinRequest, authData.authToken()));
+        assertThrows(Exception.class, () -> facade.joinGame(joinRequest, authData.authToken()));
     }
 
 }

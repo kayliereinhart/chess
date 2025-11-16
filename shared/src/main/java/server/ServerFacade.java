@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import gsonbuilder.GameGsonBuilder;
 import model.*;
 
 import java.net.URI;
@@ -17,7 +16,6 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
-        // serializer = new GameGsonBuilder().createSerializer();
         serializer = new Gson();
     }
 
@@ -54,6 +52,12 @@ public class ServerFacade {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
+    }
+
+    public void joinGame(JoinGameRequest joinRequest, String authToken) throws Exception {
+        var request = buildRequest("PUT", "/game", joinRequest, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, String header) {
