@@ -1,15 +1,10 @@
 package client;
 
-import model.CreateGameRequest;
-import model.GameData;
-import model.ListGamesResult;
-import model.UserData;
+import chess.ChessGame;
+import model.*;
 import server.ServerFacade;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Client {
 
@@ -56,7 +51,7 @@ public class Client {
                 case "login" -> login(params);
                 case "create" -> createGame(params);
                 case "list" -> listGames();
-                case "join" -> "join result";
+                case "join" -> joinGame(params);
                 case "observe" -> "observe result";
                 case "logout" -> logout();
                 case "quit" -> "quit";
@@ -125,14 +120,38 @@ public class Client {
         ArrayList<GameData> games = new ArrayList<>(server.listGames(authToken).games());
         StringBuilder strBuilder = new StringBuilder();
 
-        for (int i = 1; i < games.size(); i++) {
+        for (int i = 0; i < games.size(); i++) {
             GameData game = games.get(i);
             String whiteUser = game.whiteUsername() == null ? "None" : game.whiteUsername();
-            strBuilder.append(i + ": " + game.gameName() + "\n");
-            strBuilder.append("    White Player: " + game.whiteUsername() + "\n");
-            strBuilder.append("    Black Player: " + game.blackUsername() + "\n");
+            String blackUser = game.blackUsername() == null ? "None" : game.blackUsername();
+
+            strBuilder.append(i+1 + ": " + game.gameName() + "\n");
+            strBuilder.append("    White Player: " + whiteUser + "\n");
+            strBuilder.append("    Black Player: " + blackUser + "\n");
         }
         return strBuilder.toString();
+    }
+
+    private String joinGame(String... params) throws Exception {
+        assertLoggedIn();
+
+        if (params.length == 2) {
+            ChessGame.TeamColor color;
+
+            if (Objects.equals(params[1], "white")) {
+                color = ChessGame.TeamColor.WHITE;
+            } else if (Objects.equals(params[1], "black")) {
+                color = ChessGame.TeamColor.BLACK;
+            } else {
+                throw new Exception("Expected: <ID> [WHITE|BLACK]");
+            }
+
+            JoinGameRequest request = new JoinGameRequest(username, color, Integer.parseInt(params[0]));
+            server.joinGame(request, authToken);
+
+            return username + " joined game " + params[0] + " as " + params[1];
+        }
+        throw new Exception("Expected: <ID> [WHITE|BLACK]");
     }
 
     private String logout() throws Exception {
