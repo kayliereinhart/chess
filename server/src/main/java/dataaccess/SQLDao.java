@@ -23,19 +23,23 @@ public class SQLDao {
         }
     }
 
+    private void insertParams(PreparedStatement ps, Object... params) throws Exception {
+        for (int i = 0; i < params.length; i++) {
+            Object param = params[i];
+            switch (param) {
+                case String p -> ps.setString(i + 1, p);
+                case Integer p -> ps.setInt(i + 1, p);
+                case null -> ps.setNull(i + 1, NULL);
+                default -> {
+                }
+            }
+        }
+    }
+
     public int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
-                    }
-                }
+                insertParams(ps, params);
                 ps.executeUpdate();
 
                 ResultSet rs = ps.getGeneratedKeys();
@@ -44,7 +48,7 @@ public class SQLDao {
                 }
                 return 0;
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DataAccessException(String.format("Unable to update database: %s", e.getMessage()));
         }
     }
