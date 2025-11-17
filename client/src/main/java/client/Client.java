@@ -185,7 +185,7 @@ public class Client {
                     throw new Exception("Error: ID should be an integer");
                 }
 
-                if (id > gameMap.size()) {
+                if (id > gameMap.size() || id <= 0) {
                     throw new Exception("Error: No game with ID");
                 }
 
@@ -236,7 +236,7 @@ public class Client {
                 case BLACK -> strBuilder.append(i + " ");
             }
 
-            for (int j = 1; j < 9; j++) {
+            for (int j = 8; j >= 1; j--) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i, j));
 
                 switch (light) {
