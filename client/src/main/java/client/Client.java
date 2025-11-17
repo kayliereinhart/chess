@@ -161,7 +161,7 @@ public class Client {
                 throw new Exception("Error: ID should be an integer");
             }
 
-            if ( id > gameMap.size()) {
+            if ( id > gameMap.size() || id <= 0) {
                 throw new Exception("Error: No game with ID");
             }
 
