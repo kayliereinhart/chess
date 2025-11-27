@@ -58,6 +58,10 @@ public class Client {
                 case "list" -> listGames();
                 case "join" -> joinGame(params);
                 case "observe" -> observe(params);
+                case "redraw" -> "redraw output";
+                case "leave" -> "leave output";
+                case "resign" -> "resign output";
+                case "legal" -> "legal output";
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> "command not recognized\nvalid commands:\n" + help();
@@ -84,9 +88,9 @@ public class Client {
         } else {
             return "   redraw - board\n" +
                     "   leave - game\n" +
-                    "   makeMove - move piece\n" +
+                    "   move - piece\n" +
                     "   resign - forfeit game\n" +
-                    "   legalMoves - highlight legal moves\n" +
+                    "   legal - highlight legal moves\n" +
                     "   help - with possible commands";
         }
     }
