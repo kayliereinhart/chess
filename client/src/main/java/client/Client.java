@@ -73,14 +73,22 @@ public class Client {
                     "   login <USERNAME> <PASSWORD> - to play chess\n" +
                     "   quit - playing chess\n" +
                     "   help - with possible commands";
+        } else if (state == State.LOGGEDIN) {
+            return "   create <NAME> - a game\n" +
+                    "   list - games\n" +
+                    "   join <ID> [WHITE|BLACK] - a game\n" +
+                    "   observe <ID> - a game\n" +
+                    "   logout - when you are done\n" +
+                    "   quit - playing chess\n" +
+                    "   help - with possible commands";
+        } else {
+            return "   redraw - board\n" +
+                    "   leave - game\n" +
+                    "   makeMove - move piece\n" +
+                    "   resign - forfeit game\n" +
+                    "   legalMoves - highlight legal moves\n" +
+                    "   help - with possible commands";
         }
-        return "   create <NAME> - a game\n" +
-                "   list - games\n" +
-                "   join <ID> [WHITE|BLACK] - a game\n" +
-                "   observe <ID> - a game\n" +
-                "   logout - when you are done\n" +
-                "   quit - playing chess\n" +
-                "   help - with possible commands";
     }
 
     private String register(String... params) throws Exception {
@@ -167,6 +175,7 @@ public class Client {
 
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
+            state = State.INGAME;
 
             return printBoard(color);
         }
@@ -188,6 +197,7 @@ public class Client {
                 if (id > gameMap.size() || id <= 0) {
                     throw new Exception("Error: No game with ID");
                 }
+                state = State.INGAME;
 
                 return printBoard(ChessGame.TeamColor.WHITE);
             } catch (Exception e) {
