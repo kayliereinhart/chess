@@ -306,7 +306,7 @@ public class Client implements ServerMessageObserver {
     }
 
     public void notify(ServerMessage message) {
-        System.out.println(message.getServerMessageType());
+        System.out.println(message.getServerMessageType() + "\n");
         printPrompt();
     }
 }

@@ -22,12 +22,12 @@ public class Server {
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         exceptionHandler = new ExceptionHandler();
-        wsHandler = new WsHandler();
 
         try {
             userHandler = new UserHandler();
             gameHandler = new GameHandler();
-        } catch (DataAccessException e) {
+            wsHandler = new WsHandler();
+        } catch (Exception e) {
             throw new RuntimeException(String.format("Could not initialize database: %s", e.getMessage()));
         }
 

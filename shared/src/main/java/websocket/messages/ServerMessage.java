@@ -26,11 +26,6 @@ public class ServerMessage {
     }
 
     @Override
-    public String toString() {
-        return "SOMEONE JOINED GAME";
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

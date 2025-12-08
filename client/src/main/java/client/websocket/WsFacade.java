@@ -27,8 +27,12 @@ public class WsFacade extends Endpoint  {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    observer.notify(notification);
+                    try {
+                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                        observer.notify(notification);
+                    } catch (Exception e) {
+                        observer.notify(new ServerMessage(ServerMessage.ServerMessageType.ERROR));
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException e) {
