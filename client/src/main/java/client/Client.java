@@ -4,22 +4,27 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import client.websocket.ServerMessageObserver;
+import client.websocket.WsFacade;
 import model.*;
-
 import java.util.*;
 
 import ui.EscapeSequences;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
-public class Client {
+public class Client implements ServerMessageObserver {
 
     private final ServerFacade server;
+    private final WsFacade ws;
     private State state = State.LOGGEDOUT;
     private HashMap<Integer, Integer> gameMap = null;
     private String username = null;
     private String authToken = null;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
+        ws = new WsFacade(serverUrl, this);
     }
 
     public void run() {
@@ -176,6 +181,7 @@ public class Client {
             if ( id > gameMap.size() || id <= 0) {
                 throw new Exception("Error: No game with ID");
             }
+            ws.connectToGame(authToken, gameMap.get(id));
 
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
@@ -297,5 +303,10 @@ public class Client {
             case BLACK -> strBuilder.append("   h  g  f  e  d  c  b  a\n");
         }
         return strBuilder.toString();
+    }
+
+    public void notify(ServerMessage message) {
+        System.out.println(message.getServerMessageType());
+        printPrompt();
     }
 }

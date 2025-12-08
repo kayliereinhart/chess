@@ -8,6 +8,8 @@ import io.javalin.http.HttpResponseException;
 import handler.ExceptionHandler;
 import handler.GameHandler;
 import handler.UserHandler;
+import server.websocket.ConnectionManager;
+import server.websocket.WsHandler;
 
 public class Server {
 
@@ -15,10 +17,12 @@ public class Server {
     private final UserHandler userHandler;
     private final GameHandler gameHandler;
     private final ExceptionHandler exceptionHandler;
+    private final WsHandler wsHandler;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         exceptionHandler = new ExceptionHandler();
+        wsHandler = new WsHandler();
 
         try {
             userHandler = new UserHandler();
@@ -43,6 +47,13 @@ public class Server {
         // Exceptions
         server.exception(Exception.class, this::handleException);
         server.exception(HttpResponseException.class, this::handleException);
+
+        // WebSocket
+        server.ws("/ws", ws -> {
+            ws.onConnect(wsHandler);
+            ws.onMessage(wsHandler);
+            ws.onClose(wsHandler);
+        });
     }
 
     private void clear(Context ctx) throws DataAccessException {
