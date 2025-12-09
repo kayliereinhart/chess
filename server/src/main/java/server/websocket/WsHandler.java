@@ -118,7 +118,9 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
 
             if (!Objects.equals(username, gameData.whiteUsername()) &&
                     !Objects.equals(username, gameData.blackUsername())) {
-                throw new Exception("Only the white and black players can resign");
+                throw new Exception("You cannot resign as an observer");
+            } else if (game.getStatus() == ChessGame.GameStatus.OVER) {
+                throw new Exception("You cannot resign when the game is over");
             }
             game.changeStatus(ChessGame.GameStatus.OVER);
             gameDAO.updateGame(command.getGameID(), game);
