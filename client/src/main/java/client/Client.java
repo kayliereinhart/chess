@@ -287,19 +287,43 @@ public class Client implements ServerMessageObserver {
     private String move(String... params) throws Exception {
         assertLoggedIn();
 
-        if (params.length == 2) {
+        if (params.length > 1 && params.length < 4) {
             String start = params[0];
             String end = params[1];
+            ChessPiece.PieceType promote = null;
+
+            if (params.length == 3) {
+                try {
+                    promote = getPieceType(params[2].toLowerCase());
+                } catch (Exception e) {
+                    throw new Exception("Error: invalid piece type");
+                }
+            }
 
             if (!validPosition(start) || !validPosition(end)) {
                 throw new Exception("Error: positions must be 2 characters long. A letter then a number.");
             }
-            ws.makeMove(authToken, currentID, start, end);
+            //ws.makeMove(authToken, currentID, start, end, promote);
 
-            return "";
+            return "valid";
         } else {
-            throw new Exception("Expected: <START> <END>");
+            throw new Exception("Expected: <START> <END> <OPTIONAL PROMOTION PIECE>");
         }
+    }
+
+    private ChessPiece.PieceType getPieceType(String piece) throws Exception {
+        ChessPiece.PieceType type;
+
+        switch (piece) {
+            case "pawn" -> type = ChessPiece.PieceType.PAWN;
+            case "bishop" -> type = ChessPiece.PieceType.BISHOP;
+            case "rook" -> type = ChessPiece.PieceType.ROOK;
+            case "knight" -> type = ChessPiece.PieceType.KNIGHT;
+            case "king" -> type = ChessPiece.PieceType.KING;
+            case "queen" -> type = ChessPiece.PieceType.QUEEN;
+            default -> throw new Exception("invalid piece");
+        }
+        return type;
     }
 
     private boolean validPosition(String position) {
