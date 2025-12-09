@@ -1,14 +1,13 @@
 package client.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import gsonbuilder.GameGsonBuilder;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class WsFacade extends Endpoint  {
 

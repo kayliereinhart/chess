@@ -25,6 +25,8 @@ public class Client implements ServerMessageObserver {
     private HashMap<Integer, Integer> gameMap = null;
     private String username = null;
     private String authToken = null;
+    private ChessGame currentGame = null;
+    private ChessGame.TeamColor currentColor = null;
 
     public Client(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
@@ -185,15 +187,14 @@ public class Client implements ServerMessageObserver {
             if ( id > gameMap.size() || id <= 0) {
                 throw new Exception("Error: No game with ID");
             }
+            currentColor = color;
             ws.connectToGame(authToken, gameMap.get(id));
 
             JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
             server.joinGame(request, authToken);
             state = State.INGAME;
 
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            return printBoard(board, color);
+            return "";
         }
         throw new Exception("Expected: <ID> [WHITE|BLACK]");
     }
@@ -317,7 +318,7 @@ public class Client implements ServerMessageObserver {
 
         ServerMessage notification = serializer.fromJson(message, ServerMessage.class);
         switch (notification.getServerMessageType()) {
-            case LOAD_GAME -> System.out.println(loadGameNotify(message));
+            case LOAD_GAME -> System.out.println(loadGame(message));
             case ERROR -> System.out.println((serializer.fromJson(
                     message, ErrorMessage.class)).getMessage());
             case NOTIFICATION -> System.out.println((serializer.fromJson(
@@ -326,19 +327,13 @@ public class Client implements ServerMessageObserver {
         printPrompt();
     }
 
-    public String loadGameNotify(String message) {
+    public String loadGame(String message) {
         GameGsonBuilder builder = new GameGsonBuilder();
         Gson serializer = builder.createSerializer();
 
-        //ChessGame game = new ChessGame();
-
         LoadGameMessage loadMsg = serializer.fromJson(message, LoadGameMessage.class);
-//        var m = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-//        String l = serializer.toJson(m);
-//
-//        LoadGameMessage loadMsg = serializer.fromJson(l, LoadGameMessage.class);
 
-        ChessBoard board = loadMsg.getBoard();
-        return printBoard(board, ChessGame.TeamColor.WHITE);
+        currentGame = loadMsg.getGame();
+        return printBoard(currentGame.getBoard(), currentColor);
     }
 }
