@@ -125,7 +125,7 @@ public class ChessGame {
         if (validMoves != null && validMoves.contains(move) && piece.getTeamColor() == teamTurn) {
             board.movePiece(move);
             changeTurn();
-        } else if (piece.getTeamColor() != teamTurn) {
+        } else if (piece != null && piece.getTeamColor() != teamTurn) {
             throw new InvalidMoveException("Not your turn");
         } else {
             throw new InvalidMoveException("Invalid Move");
