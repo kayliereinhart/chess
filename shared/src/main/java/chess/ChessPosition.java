@@ -36,9 +36,23 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "[" + row +
-                "," + col +
-                ']';
+        return  convertToLetter(col) + String.valueOf(row);
+    }
+
+    private char convertToLetter(int num) {
+        char c = 'z';
+
+        switch (num) {
+            case 1 -> c = 'a';
+            case 2 -> c = 'b';
+            case 3 -> c = 'c';
+            case 4 -> c = 'd';
+            case 5 -> c = 'e';
+            case 6 -> c = 'f';
+            case 7 -> c = 'g';
+            case 8 -> c = 'h';
+        }
+        return c;
     }
 
     @Override

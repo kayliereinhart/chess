@@ -303,9 +303,9 @@ public class Client implements ServerMessageObserver {
             if (!validPosition(start) || !validPosition(end)) {
                 throw new Exception("Error: positions must be 2 characters long. A letter then a number.");
             }
-            //ws.makeMove(authToken, currentID, start, end, promote);
+            ws.makeMove(authToken, currentID, start, end, promote);
 
-            return "valid";
+            return "";
         } else {
             throw new Exception("Expected: <START> <END> <OPTIONAL PROMOTION PIECE>");
         }

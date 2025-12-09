@@ -1,16 +1,19 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
 import gsonbuilder.GameGsonBuilder;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.ConnectCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -100,11 +103,23 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
     }
 
     private void makeMove(Session session, String username, MoveCommand command) throws Exception {
+        GameData gameData = gameDAO.getGame(command.getGameID());
+        ChessGame game = gameData.game();
 
+        try {
+            game.makeMove(command.getMove());
+            gameDAO.updateGame(command.getGameID(), game);
 
+            var loadMsg = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            connections.broadcast(command.getGameID(), null, loadMsg);
 
-        ChessGame game = gameDAO.getGame(command.getGameID()).game();
-        game.changeStatus(ChessGame.GameStatus.OVER);
-        gameDAO.updateGame(command.getGameID(), game);
+            String message = String.format("%s made move: %s", username, command.getMove());
+            var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(command.getGameID(), session, notification);
+        } catch (InvalidMoveException e) {
+            String message = String.format(e.getMessage());
+            var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            session.getRemote().sendString(new Gson().toJson(errorMsg));
+        }
     }
 }
