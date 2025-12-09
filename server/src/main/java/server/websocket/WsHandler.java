@@ -144,6 +144,8 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             if (!Objects.equals(username, gameData.whiteUsername()) &&
                     !Objects.equals(username, gameData.blackUsername())) {
                 throw new InvalidMoveException("You cannot make moves as an observer");
+            } else if (game.getStatus() == ChessGame.GameStatus.OVER) {
+                throw new InvalidMoveException("You cannot make moves after the game is over");
             }
 
             if ((Objects.equals(username, gameData.whiteUsername()) &&
