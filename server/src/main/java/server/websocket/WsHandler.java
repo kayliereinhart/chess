@@ -175,18 +175,30 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
                 message = "White is in checkmate";
                 notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(command.getGameID(), null, notification);
+
+                game.changeStatus(ChessGame.GameStatus.OVER);
+                gameDAO.updateGame(command.getGameID(), game);
             } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
                 message = "Black is in checkmate";
                 notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(command.getGameID(), null, notification);
+
+                game.changeStatus(ChessGame.GameStatus.OVER);
+                gameDAO.updateGame(command.getGameID(), game);
             } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
                 message = "White is in stalemate";
                 notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(command.getGameID(), null, notification);
+
+                game.changeStatus(ChessGame.GameStatus.OVER);
+                gameDAO.updateGame(command.getGameID(), game);
             } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
                 message = "Black is in stalemate";
                 notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(command.getGameID(), null, notification);
+
+                game.changeStatus(ChessGame.GameStatus.OVER);
+                gameDAO.updateGame(command.getGameID(), game);
             }
         } catch (Exception e) {
             handleException(e, session);

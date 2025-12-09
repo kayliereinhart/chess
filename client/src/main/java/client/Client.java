@@ -239,11 +239,14 @@ public class Client implements ServerMessageObserver {
         return name + " logged out";
     }
 
-    private String redrawBoard() {
+    private String redrawBoard() throws Exception {
+        assertInGame();
         return printBoard(currentGame.getBoard(), currentColor, null, null);
     }
 
     private String leave() throws Exception {
+        assertInGame();
+
         ws.leaveGame(authToken, currentID);
         state = State.LOGGEDIN;
         currentGame = null;
@@ -253,6 +256,7 @@ public class Client implements ServerMessageObserver {
     }
 
     private String resign() throws Exception {
+        assertInGame();
         System.out.println("Do you want to resign?");
 
         Scanner scanner = new Scanner(System.in);
@@ -283,6 +287,7 @@ public class Client implements ServerMessageObserver {
 
     private String move(String... params) throws Exception {
         assertLoggedIn();
+        assertInGame();
 
         if (params.length > 1 && params.length < 4) {
             String start = params[0];
@@ -310,6 +315,7 @@ public class Client implements ServerMessageObserver {
 
     private String legal(String... params) throws Exception {
         assertLoggedIn();
+        assertInGame();
 
         if (params.length == 1) {
             if (!validPosition(params[0])) {
@@ -358,6 +364,12 @@ public class Client implements ServerMessageObserver {
         }
     }
 
+    private void assertInGame() throws Exception {
+        if (state != State.INGAME) {
+            throw new Exception("You must join a game");
+        }
+    }
+
     private Collection<ChessPosition> flipPositions(Collection<ChessPosition> positions) {
         Collection<ChessPosition> newPositions = new ArrayList<>();
 
@@ -398,40 +410,25 @@ public class Client implements ServerMessageObserver {
                 ChessPosition pos = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(pos);
 
-                switch (light) {
-                    case 0:
+                if (light == 0) {
+                    if (Objects.equals(pos, position)) {
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+                    } else if (valid != null && valid.contains(pos)) {
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_BLACK);
+                    } else {
                         strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-                        light = 1;
-                        break;
-                    case 1:
+                    }
+                    light = 1;
+                } else {
+                    if (Objects.equals(pos, position)) {
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+                    } else if (valid != null && valid.contains(pos)) {
+                        strBuilder.append(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
+                    } else {
                         strBuilder.append(EscapeSequences.SET_BG_COLOR_RED);
-                        light = 0;
-                        break;
+                    }
+                    light = 0;
                 }
-
-                if (Objects.equals(pos, position)) {
-                    strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
-                }
-
-//                if (light == 0) {
-//                    if (Objects.equals(pos, position)) {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
-//                    } else if (valid.contains(pos)) {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_BLACK);
-//                    } else {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
-//                    }
-//                    light = 1;
-//                } else {
-//                    if (Objects.equals(pos, position)) {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
-//                    } else if (valid.contains(pos)) {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREY);
-//                    } else {
-//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_RED);
-//                    }
-//                    light = 0;
-//                }
 
                 if (piece == null) {
                     strBuilder.append("   ");
