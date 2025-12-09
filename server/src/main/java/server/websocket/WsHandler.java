@@ -49,7 +49,7 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, new Gson().fromJson(ctx.message(), ConnectCommand.class));
                 case LEAVE -> leave(session, command);
-                case RESIGN -> resign(command);
+                case RESIGN -> resign(session, command);
                 case MAKE_MOVE -> makeMove(session, new Gson().fromJson(ctx.message(), MoveCommand.class));
             }
         } catch (Exception e) {
@@ -110,24 +110,49 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
         connections.broadcast(command.getGameID(), null, notification);
     }
 
-    private void resign(UserGameCommand command) throws Exception {
-        ChessGame game = gameDAO.getGame(command.getGameID()).game();
-        game.changeStatus(ChessGame.GameStatus.OVER);
-        gameDAO.updateGame(command.getGameID(), game);
+    private void resign(Session session, UserGameCommand command) throws Exception {
+        try {
+            String username = authDAO.getAuth(command.getAuthToken()).username();
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            ChessGame game = gameData.game();
 
-        String username = authDAO.getAuth(command.getAuthToken()).username();
+            if (!Objects.equals(username, gameData.whiteUsername()) &&
+                    !Objects.equals(username, gameData.blackUsername())) {
+                throw new Exception("Only the white and black players can resign");
+            }
+            game.changeStatus(ChessGame.GameStatus.OVER);
+            gameDAO.updateGame(command.getGameID(), game);
 
-        String message = String.format("%s resigned", username);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.getGameID(), null, notification);
+            String message = String.format("%s resigned", username);
+            var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(command.getGameID(), null, notification);
+        } catch (Exception e) {
+            String message = e.getMessage();
+            var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            session.getRemote().sendString(new Gson().toJson(errorMsg));
+        }
     }
 
     private void makeMove(Session session, MoveCommand command) throws Exception {
-        String username = authDAO.getAuth(command.getAuthToken()).username();
-        GameData gameData = gameDAO.getGame(command.getGameID());
-        ChessGame game = gameData.game();
-
         try {
+            String username = authDAO.getAuth(command.getAuthToken()).username();
+            GameData gameData = gameDAO.getGame(command.getGameID());
+            ChessGame game = gameData.game();
+
+            if (!Objects.equals(username, gameData.whiteUsername()) &&
+                    !Objects.equals(username, gameData.blackUsername())) {
+                throw new InvalidMoveException("You cannot make moves as an observer");
+            }
+
+            if ((Objects.equals(username, gameData.whiteUsername()) &&
+                    game.getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor() !=
+                            ChessGame.TeamColor.WHITE) ||
+                    (Objects.equals(username, gameData.blackUsername()) &&
+                    game.getBoard().getPiece(command.getMove().getStartPosition()).getTeamColor() !=
+                            ChessGame.TeamColor.BLACK)) {
+                throw new InvalidMoveException("You cannot move another player's piece");
+            }
+
             game.makeMove(command.getMove());
             gameDAO.updateGame(command.getGameID(), game);
 
@@ -163,7 +188,7 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
                 notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                 connections.broadcast(command.getGameID(), null, notification);
             }
-        } catch (InvalidMoveException e) {
+        } catch (Exception e) {
             String message = String.format(e.getMessage());
             var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
             session.getRemote().sendString(new Gson().toJson(errorMsg));
