@@ -72,6 +72,7 @@ public class Client implements ServerMessageObserver {
                 case "observe" -> observe(params);
                 case "redraw" -> redrawBoard();
                 case "leave" -> leave();
+                case "move" -> move(params);
                 case "resign" -> resign();
                 case "legal" -> "legal output";
                 case "logout" -> logout();
@@ -100,9 +101,9 @@ public class Client implements ServerMessageObserver {
         } else {
             return "   redraw - board\n" +
                     "   leave - game\n" +
-                    "   move - piece\n" +
+                    "   move <START> <END> - piece\n" +
                     "   resign - forfeit game\n" +
-                    "   legal - highlight legal moves\n" +
+                    "   legal <POSITION> - highlight legal moves\n" +
                     "   help - with possible commands";
         }
     }
@@ -281,6 +282,27 @@ public class Client implements ServerMessageObserver {
             }
         }
         return "";
+    }
+
+    private String move(String... params) throws Exception {
+        assertLoggedIn();
+
+        if (params.length == 2) {
+            String start = params[0];
+            String end = params[1];
+
+            if (!validPosition(start) || !validPosition(end)) {
+                throw new Exception("Error: positions must be 2 characters long. A letter then a number.");
+            }
+        } else {
+            throw new Exception("Expected: <START> <END>");
+        }
+    }
+
+    private boolean validPosition(String position) {
+        return position.length() == 2 &&
+                Character.isLetter(position.charAt(0)) &&
+                Character.isDigit(position.charAt(1));
     }
 
     private void assertLoggedIn() throws Exception {
