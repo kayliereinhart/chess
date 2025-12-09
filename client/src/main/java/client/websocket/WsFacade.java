@@ -67,4 +67,8 @@ public class WsFacade extends Endpoint  {
         var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, id);
         this.session.getBasicRemote().sendText(serializer.toJson(command));
     }
+
+    public void makeMove(String authToken, Integer id, String start, String end) {
+
+    }
 }
