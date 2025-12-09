@@ -116,6 +116,32 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             String message = String.format("%s made move: %s", username, command.getMove());
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(command.getGameID(), session, notification);
+
+            if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                message = "White is in check";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                message = "Black is in check";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                message = "White is in checkmate";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                message = "Black is in checkmate";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                message = "White is in stalemate";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                message = "Black is in stalemate";
+                notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(command.getGameID(), null, notification);
+            }
         } catch (InvalidMoveException e) {
             String message = String.format(e.getMessage());
             var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
