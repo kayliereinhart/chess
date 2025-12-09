@@ -34,6 +34,10 @@ public class ChessPosition {
         return col;
     }
 
+    public ChessPosition flip() {
+        return new ChessPosition(9 - row, 9 - col);
+    }
+
     @Override
     public String toString() {
         return  convertToLetter(col) + String.valueOf(row);

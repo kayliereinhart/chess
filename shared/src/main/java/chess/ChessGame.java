@@ -132,7 +132,7 @@ public class ChessGame {
         }
     }
 
-    private Collection<ChessPosition> getEndPositions(Collection<ChessMove> moves) {
+    public Collection<ChessPosition> getEndPositions(Collection<ChessMove> moves) {
         Collection<ChessPosition> endPositions = new ArrayList<>();
 
         for (ChessMove move : moves) {

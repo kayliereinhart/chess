@@ -89,7 +89,7 @@ public class WsFacade extends Endpoint  {
         this.session.getBasicRemote().sendText(serializer.toJson(command));
     }
 
-    private int convertToNum(Character c) {
+    public int convertToNum(Character c) {
         int num;
         switch (c) {
             case 'a' -> num = 1;

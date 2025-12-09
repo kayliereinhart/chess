@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import gsonbuilder.GameGsonBuilder;
 import client.websocket.ServerMessageObserver;
 import client.websocket.WsFacade;
@@ -74,7 +71,7 @@ public class Client implements ServerMessageObserver {
                 case "leave" -> leave();
                 case "move" -> move(params);
                 case "resign" -> resign();
-                case "legal" -> "legal output";
+                case "legal" -> legal(params);
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> "command not recognized\nvalid commands:\n" + help();
@@ -101,7 +98,7 @@ public class Client implements ServerMessageObserver {
         } else {
             return "   redraw - board\n" +
                     "   leave - game\n" +
-                    "   move <START> <END> - piece\n" +
+                    "   move <START> <END> <OPTIONAL PROMOTION PIECE>- piece\n" +
                     "   resign - forfeit game\n" +
                     "   legal <POSITION> - highlight legal moves\n" +
                     "   help - with possible commands";
@@ -243,7 +240,7 @@ public class Client implements ServerMessageObserver {
     }
 
     private String redrawBoard() {
-        return printBoard(currentGame.getBoard(), currentColor);
+        return printBoard(currentGame.getBoard(), currentColor, null, null);
     }
 
     private String leave() throws Exception {
@@ -311,6 +308,29 @@ public class Client implements ServerMessageObserver {
         }
     }
 
+    private String legal(String... params) throws Exception {
+        assertLoggedIn();
+
+        if (params.length == 1) {
+            if (!validPosition(params[0])) {
+                throw new Exception("Error: position must be 2 characters long. A letter then a number.");
+            }
+            ChessPosition position = new ChessPosition(Character.getNumericValue(params[0].charAt(1)),
+                    ws.convertToNum(params[0].charAt(0)));
+
+            Collection<ChessPosition> valid;
+            if (currentGame.getBoard().getPiece(position) == null) {
+                valid = null;
+            } else {
+                valid = currentGame.getEndPositions(currentGame.validMoves(position));
+            }
+
+            return printBoard(currentGame.getBoard(), currentColor, position, valid);
+        } else {
+            throw new Exception("Expected: <POSITION>");
+        }
+    }
+
     private ChessPiece.PieceType getPieceType(String piece) throws Exception {
         ChessPiece.PieceType type;
 
@@ -338,12 +358,29 @@ public class Client implements ServerMessageObserver {
         }
     }
 
-    private String printBoard(ChessBoard board, ChessGame.TeamColor color) {
+    private Collection<ChessPosition> flipPositions(Collection<ChessPosition> positions) {
+        Collection<ChessPosition> newPositions = new ArrayList<>();
+
+        for (ChessPosition position : positions) {
+            newPositions.add(position.flip());
+        }
+        return newPositions;
+    }
+
+    private String printBoard(ChessBoard board, ChessGame.TeamColor color,
+                              ChessPosition position, Collection<ChessPosition> valid) {
         StringBuilder strBuilder = new StringBuilder();
         int light = 1;
 
         if (color == ChessGame.TeamColor.WHITE) {
             board = board.flipBoard();
+
+            if (position != null) {
+                position = position.flip();
+            }
+            if (valid != null) {
+                valid = flipPositions(valid);
+            }
         }
 
         switch (color) {
@@ -358,7 +395,8 @@ public class Client implements ServerMessageObserver {
             }
 
             for (int j = 8; j >= 1; j--) {
-                ChessPiece piece = board.getPiece(new ChessPosition(i, j));
+                ChessPosition pos = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(pos);
 
                 switch (light) {
                     case 0:
@@ -370,6 +408,30 @@ public class Client implements ServerMessageObserver {
                         light = 0;
                         break;
                 }
+
+                if (Objects.equals(pos, position)) {
+                    strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+                }
+
+//                if (light == 0) {
+//                    if (Objects.equals(pos, position)) {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+//                    } else if (valid.contains(pos)) {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_BLACK);
+//                    } else {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+//                    }
+//                    light = 1;
+//                } else {
+//                    if (Objects.equals(pos, position)) {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_MAGENTA);
+//                    } else if (valid.contains(pos)) {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_DARK_GREY);
+//                    } else {
+//                        strBuilder.append(EscapeSequences.SET_BG_COLOR_RED);
+//                    }
+//                    light = 0;
+//                }
 
                 if (piece == null) {
                     strBuilder.append("   ");
@@ -428,6 +490,6 @@ public class Client implements ServerMessageObserver {
         LoadGameMessage loadMsg = serializer.fromJson(message, LoadGameMessage.class);
 
         currentGame = loadMsg.getGame();
-        return printBoard(currentGame.getBoard(), currentColor);
+        return printBoard(currentGame.getBoard(), currentColor, null, null);
     }
 }
