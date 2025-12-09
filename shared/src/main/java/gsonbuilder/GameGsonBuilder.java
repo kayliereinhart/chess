@@ -30,7 +30,7 @@ public class GameGsonBuilder {
         });
 
         gsonBuilder.registerTypeAdapter(MovementRule.class,
-                (JsonDeserializer<MovementRule>) (el, _, ctx) -> {
+                (JsonDeserializer<MovementRule>) (el, type, ctx) -> {
             if (!el.isJsonObject()) {
                 return null;
             }
