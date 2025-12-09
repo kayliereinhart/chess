@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import gsonbuilder.GameGsonBuilder;
 import jakarta.websocket.*;
+import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -34,7 +35,7 @@ public class WsFacade extends Endpoint  {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void connectToGame(String authToken, int id) throws Exception {
+    public void connectToGame(String authToken, int id, ChessGame.TeamColor color) throws Exception {
         try {
             this.session = container.connectToServer(this, socketURI);
             //set message handler
@@ -49,10 +50,16 @@ public class WsFacade extends Endpoint  {
                 }
             });
 
-            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, id);
+            var command = new ConnectCommand(UserGameCommand.CommandType.CONNECT, authToken, id, color);
             this.session.getBasicRemote().sendText(serializer.toJson(command));
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
+    }
+
+    public void leaveGame(String authToken, Integer id) throws Exception {
+        var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, id);
+        this.session.getBasicRemote().sendText(serializer.toJson(command));
+        this.session.close();
     }
 }

@@ -12,6 +12,7 @@ import model.*;
 import java.util.*;
 
 import ui.EscapeSequences;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -27,6 +28,7 @@ public class Client implements ServerMessageObserver {
     private String authToken = null;
     private ChessGame currentGame = null;
     private ChessGame.TeamColor currentColor = null;
+    private Integer currentID = null;
 
     public Client(String serverUrl) throws Exception {
         server = new ServerFacade(serverUrl);
@@ -69,8 +71,8 @@ public class Client implements ServerMessageObserver {
                 case "list" -> listGames();
                 case "join" -> joinGame(params);
                 case "observe" -> observe(params);
-                case "redraw" -> "redraw output";
-                case "leave" -> "leave output";
+                case "redraw" -> redrawBoard();
+                case "leave" -> leave();
                 case "resign" -> "resign output";
                 case "legal" -> "legal output";
                 case "logout" -> logout();
@@ -188,9 +190,10 @@ public class Client implements ServerMessageObserver {
                 throw new Exception("Error: No game with ID");
             }
             currentColor = color;
-            ws.connectToGame(authToken, gameMap.get(id));
+            currentID = gameMap.get(id);
+            ws.connectToGame(authToken, currentID, color);
 
-            JoinGameRequest request = new JoinGameRequest(username, color, gameMap.get(id));
+            JoinGameRequest request = new JoinGameRequest(username, color, currentID);
             server.joinGame(request, authToken);
             state = State.INGAME;
 
@@ -214,11 +217,12 @@ public class Client implements ServerMessageObserver {
                 if (id > gameMap.size() || id <= 0) {
                     throw new Exception("Error: No game with ID");
                 }
+                ws.connectToGame(authToken, gameMap.get(id), null);
                 state = State.INGAME;
+                currentColor = ChessGame.TeamColor.WHITE;
+                currentID = gameMap.get(id);
 
-                ChessBoard board = new ChessBoard();
-                board.resetBoard();
-                return printBoard(board, ChessGame.TeamColor.WHITE);
+                return "";
             } catch (Exception e) {
                 throw new Exception(e.getMessage());
             }
@@ -236,6 +240,19 @@ public class Client implements ServerMessageObserver {
         username = null;
 
         return name + " logged out";
+    }
+
+    private String redrawBoard() {
+        return printBoard(currentGame.getBoard(), currentColor);
+    }
+
+    private String leave() throws Exception {
+        ws.leaveGame(authToken, currentID);
+        state = State.LOGGEDIN;
+        currentGame = null;
+        currentColor = null;
+        currentID = null;
+        return "";
     }
 
     private void assertLoggedIn() throws Exception {
