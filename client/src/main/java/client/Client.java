@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import gsonbuilder.GameGsonBuilder;
 import client.websocket.ServerMessageObserver;
 import client.websocket.WsFacade;
 import com.google.gson.Gson;
@@ -11,7 +12,8 @@ import model.*;
 import java.util.*;
 
 import ui.EscapeSequences;
-import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -189,7 +191,9 @@ public class Client implements ServerMessageObserver {
             server.joinGame(request, authToken);
             state = State.INGAME;
 
-            return printBoard(color);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            return printBoard(board, color);
         }
         throw new Exception("Expected: <ID> [WHITE|BLACK]");
     }
@@ -211,7 +215,9 @@ public class Client implements ServerMessageObserver {
                 }
                 state = State.INGAME;
 
-                return printBoard(ChessGame.TeamColor.WHITE);
+                ChessBoard board = new ChessBoard();
+                board.resetBoard();
+                return printBoard(board, ChessGame.TeamColor.WHITE);
             } catch (Exception e) {
                 throw new Exception(e.getMessage());
             }
@@ -237,10 +243,8 @@ public class Client implements ServerMessageObserver {
         }
     }
 
-    private String printBoard(ChessGame.TeamColor color) {
+    private String printBoard(ChessBoard board, ChessGame.TeamColor color) {
         StringBuilder strBuilder = new StringBuilder();
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
         int light = 1;
 
         if (color == ChessGame.TeamColor.WHITE) {
@@ -308,13 +312,33 @@ public class Client implements ServerMessageObserver {
     }
 
     public void notify(String message) {
-        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+        GameGsonBuilder builder = new GameGsonBuilder();
+        Gson serializer = builder.createSerializer();
+
+        ServerMessage notification = serializer.fromJson(message, ServerMessage.class);
         switch (notification.getServerMessageType()) {
-            case LOAD_GAME -> System.out.println("LOAD_GAME");
-            case ERROR -> System.out.println("ERROR");
-            case NOTIFICATION -> System.out.println((new Gson().fromJson(
+            case LOAD_GAME -> System.out.println(loadGameNotify(message));
+            case ERROR -> System.out.println((serializer.fromJson(
+                    message, ErrorMessage.class)).getMessage());
+            case NOTIFICATION -> System.out.println((serializer.fromJson(
                     message, NotificationMessage.class)).getMessage());
         }
         printPrompt();
+    }
+
+    public String loadGameNotify(String message) {
+        GameGsonBuilder builder = new GameGsonBuilder();
+        Gson serializer = builder.createSerializer();
+
+        //ChessGame game = new ChessGame();
+
+        LoadGameMessage loadMsg = serializer.fromJson(message, LoadGameMessage.class);
+//        var m = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+//        String l = serializer.toJson(m);
+//
+//        LoadGameMessage loadMsg = serializer.fromJson(l, LoadGameMessage.class);
+
+        ChessBoard board = loadMsg.getBoard();
+        return printBoard(board, ChessGame.TeamColor.WHITE);
     }
 }

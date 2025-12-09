@@ -1,11 +1,15 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import gsonbuilder.GameGsonBuilder;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -14,9 +18,11 @@ import java.io.IOException;
 public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
     private final SQLAuthDAO authDAO;
+    private final SQLGameDAO gameDAO;
 
     public WsHandler() throws Exception {
         authDAO = new SQLAuthDAO();
+        gameDAO = new SQLGameDAO();
     }
 
     @Override
@@ -49,10 +55,14 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
         System.out.println("Websocket closed");
     }
 
-    private void connect(Session session, String username, UserGameCommand command) throws IOException {
+    private void connect(Session session, String username, UserGameCommand command) throws Exception {
         // connections.add(command.getGameID(), session);
-        var loadMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        String msg = new Gson().toJson(loadMsg);
+        GameGsonBuilder builder = new GameGsonBuilder();
+        Gson serializer = builder.createSerializer();
+
+        ChessGame game = gameDAO.getGame(command.getGameID()).game();
+        var loadMsg = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        String msg = serializer.toJson(loadMsg);
         session.getRemote().sendString(msg);
 
         String message = String.format("%s joined the game", username);

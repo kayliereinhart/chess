@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import gsonbuilder.GameGsonBuilder;
 import model.*;
 
 import java.net.URI;
@@ -16,7 +17,8 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
-        serializer = new Gson();
+        GameGsonBuilder builder = new GameGsonBuilder();
+        serializer = builder.createSerializer();
     }
 
     public void clear() throws Exception {

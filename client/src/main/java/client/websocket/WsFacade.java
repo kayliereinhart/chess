@@ -1,6 +1,7 @@
 package client.websocket;
 
 import com.google.gson.Gson;
+import gsonbuilder.GameGsonBuilder;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -15,6 +16,7 @@ public class WsFacade extends Endpoint  {
     ServerMessageObserver observer;
     URI socketURI;
     WebSocketContainer container;
+    Gson serializer;
 
     public WsFacade(String url, ServerMessageObserver observer) throws Exception {
         try {
@@ -23,18 +25,8 @@ public class WsFacade extends Endpoint  {
             this.observer = observer;
             this.container = ContainerProvider.getWebSocketContainer();
 
-//            //set message handler
-//            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-//                @Override
-//                public void onMessage(String message) {
-//                    try {
-//                       ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-//                        observer.notify(message);
-//                    } catch (Exception e) {
-//                        observer.notify(new Gson().toJson(new ServerMessage(ServerMessage.ServerMessageType.ERROR)));
-//                    }
-//                }
-            //});
+            GameGsonBuilder builder = new GameGsonBuilder();
+            serializer = builder.createSerializer();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -51,16 +43,15 @@ public class WsFacade extends Endpoint  {
                 @Override
                 public void onMessage(String message) {
                     try {
-//                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                         observer.notify(message);
                     } catch (Exception e) {
-                        observer.notify(new Gson().toJson(new ServerMessage(ServerMessage.ServerMessageType.ERROR)));
+                        observer.notify(serializer.toJson(new ServerMessage(ServerMessage.ServerMessageType.ERROR)));
                     }
                 }
             });
 
             var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, id);
-            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+            this.session.getBasicRemote().sendText(serializer.toJson(command));
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }

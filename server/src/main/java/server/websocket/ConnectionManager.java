@@ -1,6 +1,7 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import gsonbuilder.GameGsonBuilder;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -27,7 +28,10 @@ public class ConnectionManager {
     }
 
     public void broadcast(Integer id, Session excludeSession, ServerMessage notification) throws IOException {
-        String msg = new Gson().toJson(notification);
+        GameGsonBuilder builder = new GameGsonBuilder();
+        Gson serializer = builder.createSerializer();
+
+        String msg = serializer.toJson(notification);
         for (Session c : connections.get(id)) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {

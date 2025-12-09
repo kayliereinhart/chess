@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import gsonbuilder.GameGsonBuilder;
 import model.GameData;
 import com.google.gson.Gson;
 
@@ -30,10 +31,23 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
             """
         };
         configureDatabase(createStatements);
-        serializer = new Gson();
+        GameGsonBuilder builder = new GameGsonBuilder();
+        serializer = builder.createSerializer();
     }
 
-    private GameData readGame(ResultSet rs) throws SQLException {
+    private GameData readGameDataGame(ResultSet rs) throws SQLException {
+        var gameID = rs.getInt("gameID");
+        var whiteUsername = rs.getString("whiteUsername");
+        var blackUsername = rs.getString("blackUsername");
+        var gameName = rs.getString("gameName");
+
+        String gameStr = rs.getString("game");
+        ChessGame game = serializer.fromJson(gameStr, ChessGame.class);
+
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
+
+    private GameData readGameDataNoGame(ResultSet rs) throws SQLException {
         var gameID = rs.getInt("gameID");
         var whiteUsername = rs.getString("whiteUsername");
         var blackUsername = rs.getString("blackUsername");
@@ -59,7 +73,7 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        result.add(readGame(rs));
+                        result.add(readGameDataNoGame(rs));
                     }
                 }
             }
@@ -76,7 +90,7 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
                 ps.setInt(1, gameID);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readGame(rs);
+                        return readGameDataGame(rs);
                     }
                 }
             }

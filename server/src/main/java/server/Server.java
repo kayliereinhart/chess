@@ -8,7 +8,6 @@ import io.javalin.http.HttpResponseException;
 import handler.ExceptionHandler;
 import handler.GameHandler;
 import handler.UserHandler;
-import server.websocket.ConnectionManager;
 import server.websocket.WsHandler;
 
 public class Server {

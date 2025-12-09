@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 import dataaccess.DataAccessException;
+import gsonbuilder.GameGsonBuilder;
 import model.CreateGameRequest;
 import model.JoinGameRequest;
 import service.GameService;
@@ -12,10 +13,12 @@ import service.GameService;
 public class GameHandler {
 
     private final GameService gameService;
-    private final Gson serializer = new Gson();
+    private final Gson serializer;
 
     public GameHandler() throws DataAccessException {
         gameService = new GameService();
+        GameGsonBuilder builder = new GameGsonBuilder();
+        serializer = builder.createSerializer();
     }
 
     public String handleCreate(String requestJson) throws DataAccessException {
