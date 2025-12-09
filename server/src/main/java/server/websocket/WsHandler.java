@@ -88,6 +88,10 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
     }
 
     private void resign(String username, UserGameCommand command) throws Exception {
+        ChessGame game = gameDAO.getGame(command.getGameID()).game();
+        game.changeStatus(ChessGame.GameStatus.OVER);
+        gameDAO.updateGame(command.getGameID(), game);
+
         String message = String.format("%s resigned", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command.getGameID(), null, notification);

@@ -14,10 +14,12 @@ public class ChessGame {
 
     private TeamColor teamTurn = TeamColor.WHITE;
     private ChessBoard board;
+    private GameStatus status;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
+        status = GameStatus.INPLAY;
     }
 
     /**
@@ -25,6 +27,14 @@ public class ChessGame {
      */
     public TeamColor getTeamTurn() {
         return teamTurn;
+    }
+
+    public GameStatus getStatus() {
+        return status;
+    }
+
+    public void changeStatus(GameStatus newStatus) {
+        status = newStatus;
     }
 
     /**
@@ -42,6 +52,11 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public enum GameStatus {
+        INPLAY,
+        OVER
     }
 
     private void validateMove(Collection<ChessMove> valid, ChessMove move, ChessPiece piece) {

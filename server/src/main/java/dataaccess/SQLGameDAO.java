@@ -128,6 +128,22 @@ public class SQLGameDAO extends SQLDao implements GameDAO {
         }
     }
 
+    public void updateGame(Integer gameID, ChessGame game) throws DataAccessException {
+        try {
+            GameData currentGame = getGame(gameID);
+            String statement;
+
+            if (currentGame == null) {
+                throw new DataAccessException("game does not exist");
+            } else {
+                statement = "UPDATE games SET game=? WHERE gameID=?";
+            }
+            executeUpdate(statement, serializer.toJson(game), gameID);
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to update game: %s", e.getMessage()));
+        }
+    }
+
     @Override
     public void clearGames() throws DataAccessException {
         var statement = "TRUNCATE games";
