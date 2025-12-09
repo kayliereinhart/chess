@@ -87,9 +87,7 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(command.getGameID(), session, notification);
         } catch (Exception e) {
-            String message = e.getMessage();
-            var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
-            session.getRemote().sendString(new Gson().toJson(errorMsg));
+            handleException(e, session);
         }
     }
 
@@ -129,9 +127,7 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcast(command.getGameID(), null, notification);
         } catch (Exception e) {
-            String message = e.getMessage();
-            var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
-            session.getRemote().sendString(new Gson().toJson(errorMsg));
+            handleException(e, session);
         }
     }
 
@@ -193,9 +189,13 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
                 connections.broadcast(command.getGameID(), null, notification);
             }
         } catch (Exception e) {
-            String message = String.format(e.getMessage());
-            var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
-            session.getRemote().sendString(new Gson().toJson(errorMsg));
+            handleException(e, session);
         }
+    }
+
+    private void handleException (Exception e, Session session) throws Exception {
+        String message = String.format(e.getMessage());
+        var errorMsg = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+        session.getRemote().sendString(new Gson().toJson(errorMsg));
     }
 }
