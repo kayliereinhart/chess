@@ -6,6 +6,7 @@ import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -50,12 +51,12 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
 
     private void connect(Session session, String username, UserGameCommand command) throws IOException {
         // connections.add(command.getGameID(), session);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-
-        String msg = new Gson().toJson(notification);
+        var loadMsg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        String msg = new Gson().toJson(loadMsg);
         session.getRemote().sendString(msg);
 
-        notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        String message = String.format("%s joined the game", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command.getGameID(), session, notification);
     }
 }

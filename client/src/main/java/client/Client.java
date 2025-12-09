@@ -6,11 +6,13 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import client.websocket.ServerMessageObserver;
 import client.websocket.WsFacade;
+import com.google.gson.Gson;
 import model.*;
 import java.util.*;
 
 import ui.EscapeSequences;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 public class Client implements ServerMessageObserver {
@@ -246,8 +248,8 @@ public class Client implements ServerMessageObserver {
         }
 
         switch (color) {
-            case WHITE -> strBuilder.append("   a  b  c  d  e  f  g  h\n");
-            case BLACK -> strBuilder.append("   h  g  f  e  d  c  b  a\n");
+            case WHITE -> strBuilder.append("\n   a  b  c  d  e  f  g  h\n");
+            case BLACK -> strBuilder.append("\n   h  g  f  e  d  c  b  a\n");
         }
 
         for (int i = 1; i < 9; i++) {
@@ -305,8 +307,14 @@ public class Client implements ServerMessageObserver {
         return strBuilder.toString();
     }
 
-    public void notify(ServerMessage message) {
-        System.out.println(message.getServerMessageType() + "\n");
+    public void notify(String message) {
+        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+        switch (notification.getServerMessageType()) {
+            case LOAD_GAME -> System.out.println("LOAD_GAME");
+            case ERROR -> System.out.println("ERROR");
+            case NOTIFICATION -> System.out.println((new Gson().fromJson(
+                    message, NotificationMessage.class)).getMessage());
+        }
         printPrompt();
     }
 }

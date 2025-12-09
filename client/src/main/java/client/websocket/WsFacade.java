@@ -28,10 +28,10 @@ public class WsFacade extends Endpoint  {
                 @Override
                 public void onMessage(String message) {
                     try {
-                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                        observer.notify(notification);
+//                        ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                        observer.notify(message);
                     } catch (Exception e) {
-                        observer.notify(new ServerMessage(ServerMessage.ServerMessageType.ERROR));
+                        observer.notify(new Gson().toJson(new ServerMessage(ServerMessage.ServerMessageType.ERROR)));
                     }
                 }
             });
