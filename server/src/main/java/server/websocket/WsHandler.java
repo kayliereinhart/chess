@@ -9,6 +9,7 @@ import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.ConnectCommand;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -46,6 +47,7 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
                 case CONNECT -> connect(session, username, new Gson().fromJson(ctx.message(), ConnectCommand.class));
                 case LEAVE -> leave(session, username, command);
                 case RESIGN -> resign(username, command);
+                case MAKE_MOVE -> makeMove(session, username, new Gson().fromJson(ctx.message(), MoveCommand.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,5 +97,14 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
         String message = String.format("%s resigned", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command.getGameID(), null, notification);
+    }
+
+    private void makeMove(Session session, String username, MoveCommand command) throws Exception {
+
+
+
+        ChessGame game = gameDAO.getGame(command.getGameID()).game();
+        game.changeStatus(ChessGame.GameStatus.OVER);
+        gameDAO.updateGame(command.getGameID(), game);
     }
 }

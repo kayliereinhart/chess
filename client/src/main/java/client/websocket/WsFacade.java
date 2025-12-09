@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import gsonbuilder.GameGsonBuilder;
 import jakarta.websocket.*;
 import websocket.commands.ConnectCommand;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -71,7 +72,8 @@ public class WsFacade extends Endpoint  {
         this.session.getBasicRemote().sendText(serializer.toJson(command));
     }
 
-    public void makeMove(String authToken, Integer id, String start, String end, ChessPiece.PieceType promotion) {
+    public void makeMove(String authToken, Integer id, String start, String end,
+                         ChessPiece.PieceType promotion) throws Exception {
         int startRow = Character.getNumericValue(start.charAt(1));
         int startCol = convertToNum(start.charAt(0));
 
@@ -83,6 +85,8 @@ public class WsFacade extends Endpoint  {
 
         ChessMove move = new ChessMove(startPosition, endPosition, promotion);
 
+        MoveCommand command = new MoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, id, move);
+        this.session.getBasicRemote().sendText(serializer.toJson(command));
     }
 
     private int convertToNum(Character c) {
