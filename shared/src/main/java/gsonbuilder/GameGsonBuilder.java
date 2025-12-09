@@ -9,7 +9,7 @@ public class GameGsonBuilder {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
         gsonBuilder.registerTypeAdapter(MovementRule.class, (JsonSerializer<MovementRule>)
-                (rule, _, ctx) -> {
+                (rule, type, ctx) -> {
             JsonElement json = ctx.serialize(rule);
             JsonObject object = json.getAsJsonObject();
 
