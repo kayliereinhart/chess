@@ -19,6 +19,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -86,6 +87,14 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
 
     private void leave(Session session, String username, UserGameCommand command) throws Exception {
         connections.remove(command.getGameID(), session);
+
+        GameData gameData = gameDAO.getGame(command.getGameID());
+
+        if (Objects.equals(gameData.whiteUsername(), username)) {
+            gameDAO.addPlayer(null, ChessGame.TeamColor.WHITE, command.getGameID());
+        } else if (Objects.equals(gameData.blackUsername(), username)) {
+            gameDAO.addPlayer(null, ChessGame.TeamColor.BLACK, command.getGameID());
+        }
 
         String message = String.format("%s left the game", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
