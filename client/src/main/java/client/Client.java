@@ -12,7 +12,6 @@ import model.*;
 import java.util.*;
 
 import ui.EscapeSequences;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -73,7 +72,7 @@ public class Client implements ServerMessageObserver {
                 case "observe" -> observe(params);
                 case "redraw" -> redrawBoard();
                 case "leave" -> leave();
-                case "resign" -> "resign output";
+                case "resign" -> resign();
                 case "legal" -> "legal output";
                 case "logout" -> logout();
                 case "quit" -> "quit";
@@ -252,6 +251,35 @@ public class Client implements ServerMessageObserver {
         currentGame = null;
         currentColor = null;
         currentID = null;
+        return "";
+    }
+
+    private String resign() throws Exception {
+        System.out.println("Do you want to resign?");
+
+        Scanner scanner = new Scanner(System.in);
+        var result = "";
+        String line = "";
+
+        while (!line.equals("yes") && !line.equals("no")) {
+            printPrompt();
+            line = scanner.nextLine().toLowerCase();
+
+            try {
+                if (line.equals("yes")) {
+                    result = "";
+                    ws.resign(authToken, currentID);
+                } else if (line.equals("no")) {
+                    result = "";
+                }
+                else {
+                    result = "Expected YES or NO";
+                }
+                System.out.print(result);
+            } catch (Throwable e) {
+                System.out.print(e.toString());
+            }
+        }
         return "";
     }
 

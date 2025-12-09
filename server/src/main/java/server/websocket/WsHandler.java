@@ -41,11 +41,11 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             id = command.getGameID();
             String username = authDAO.getAuth(command.getAuthToken()).username();
-            //connections.add(id, session);
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, new Gson().fromJson(ctx.message(), ConnectCommand.class));
                 case LEAVE -> leave(session, username, command);
+                case RESIGN -> resign(username, command);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,6 +83,12 @@ public class WsHandler implements WsConnectHandler, WsMessageHandler, WsCloseHan
         connections.remove(command.getGameID(), session);
 
         String message = String.format("%s left the game", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(command.getGameID(), null, notification);
+    }
+
+    private void resign(String username, UserGameCommand command) throws Exception {
+        String message = String.format("%s resigned", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(command.getGameID(), null, notification);
     }

@@ -62,4 +62,9 @@ public class WsFacade extends Endpoint  {
         this.session.getBasicRemote().sendText(serializer.toJson(command));
         this.session.close();
     }
+
+    public void resign(String authToken, Integer id) throws Exception {
+        var command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, id);
+        this.session.getBasicRemote().sendText(serializer.toJson(command));
+    }
 }
